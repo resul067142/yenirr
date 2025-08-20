@@ -1,0 +1,99 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Giriş Yap - Cihaz Takip Sistemi{% endblock %}
+
+{% block auth_content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Logo ve Başlık -->
+        <div class="text-center">
+            <div class="mx-auto h-20 w-20 bg-blue-600 rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-mobile-alt text-white text-3xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Cihaz Takip Sistemi</h2>
+            <p class="text-gray-600">Hesabınıza giriş yapın</p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- TC Kimlik / Kullanıcı Adı -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.username.label }}
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.username.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if form.username.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.username.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Şifre -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.password.label }}
+                    </label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.password.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Giriş Butonu -->
+                <div>
+                    <button type="submit" class="w-full btn-primary py-3 text-base font-medium">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Giriş Yap
+                    </button>
+                </div>
+            </form>
+
+            <!-- Kayıt Ol Linki -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Hesabınız yok mu?
+                    <a href="{% url 'users:register' %}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
+                        Kayıt olun
+                    </a>
+                </p>
+            </div>
+
+            <!-- Yardım Linkleri -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <div class="text-center">
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        TC Kimlik Numarası veya kullanıcı adınızla giriş yapabilirsiniz
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center">
+            <p class="text-xs text-gray-500">
+                &copy; 2024 Cihaz Takip Sistemi. Tüm hakları saklıdır.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Background Pattern -->
+<div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50"></div>
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+</div>
+{% endblock %}

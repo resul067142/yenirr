@@ -1,0 +1,302 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Kayıt Ol - Cihaz Takip Sistemi{% endblock %}
+
+{% block auth_content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Logo ve Başlık -->
+        <div class="text-center">
+            <div class="mx-auto h-20 w-20 bg-green-600 rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-user-plus text-white text-3xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Hesap Oluştur</h2>
+            <p class="text-gray-600">Cihaz Takip Sistemi'ne katılın</p>
+        </div>
+
+        <!-- Register Form -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <form method="post" class="space-y-6" id="registerForm">
+                {% csrf_token %}
+                
+                <!-- TC Kimlik Numarası -->
+                <div>
+                    <label for="{{ form.tc_kimlik.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.tc_kimlik.label }}
+                    </label>
+                    {{ form.tc_kimlik }}
+                    {% if form.tc_kimlik.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.tc_kimlik.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if form.tc_kimlik.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.tc_kimlik.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Kullanıcı Adı -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.username.label }}
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.username.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Ad -->
+                <div>
+                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.first_name.label }}
+                    </label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.first_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Soyad -->
+                <div>
+                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.last_name.label }}
+                    </label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.last_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- E-posta -->
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.email.label }}
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.email.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Telefon -->
+                <div>
+                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.phone.label }}
+                    </label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.phone.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Şifre -->
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.password1.label }}
+                    </label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.password1.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Şifre Tekrarı -->
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.password2.label }}
+                    </label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.password2.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Kayıt Butonu -->
+                <div>
+                    <button type="submit" class="w-full btn-success py-3 text-base font-medium">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Hesap Oluştur
+                    </button>
+                </div>
+            </form>
+
+            <!-- Giriş Yap Linki -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Zaten hesabınız var mı?
+                    <a href="{% url 'users:login' %}" class="font-medium text-green-600 hover:text-green-500 transition-colors duration-200">
+                        Giriş yapın
+                    </a>
+                </p>
+            </div>
+
+            <!-- Bilgilendirme -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <div class="text-center">
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Bilgileriniz güvenle saklanır ve üçüncü taraflarla paylaşılmaz
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center">
+            <p class="text-xs text-gray-500">
+                &copy; 2024 Cihaz Takip Sistemi. Tüm hakları saklıdır.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Background Pattern -->
+<div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-emerald-50"></div>
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+</div>
+
+<!-- Form Validation JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const tcKimlikInput = document.getElementById('{{ form.tc_kimlik.id_for_label }}');
+    const emailInput = document.getElementById('{{ form.email.id_for_label }}');
+    const usernameInput = document.getElementById('{{ form.username.id_for_label }}');
+    
+    // TC Kimlik numarası kontrolü
+    tcKimlikInput.addEventListener('blur', function() {
+        const tcKimlik = this.value;
+        if (tcKimlik.length === 11 && /^\d+$/.test(tcKimlik)) {
+            fetch('{% url "users:check_tc_kimlik" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: 'tc_kimlik=' + encodeURIComponent(tcKimlik)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    this.classList.add('border-red-500');
+                    this.classList.remove('border-gray-300');
+                    // Hata mesajı göster
+                    let errorDiv = this.parentNode.querySelector('.tc-error');
+                    if (!errorDiv) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.className = 'mt-1 text-sm text-red-600 tc-error';
+                        this.parentNode.appendChild(errorDiv);
+                    }
+                    errorDiv.textContent = 'Bu TC Kimlik Numarası zaten kayıtlı.';
+                } else {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-gray-300');
+                    const errorDiv = this.parentNode.querySelector('.tc-error');
+                    if (errorDiv) errorDiv.remove();
+                }
+            });
+        }
+    });
+    
+    // E-posta kontrolü
+    emailInput.addEventListener('blur', function() {
+        const email = this.value;
+        if (email && email.includes('@')) {
+            fetch('{% url "users:check_email" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: 'email=' + encodeURIComponent(email)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    this.classList.add('border-red-500');
+                    this.classList.remove('border-gray-300');
+                    let errorDiv = this.parentNode.querySelector('.email-error');
+                    if (!errorDiv) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.className = 'mt-1 text-sm text-red-600 email-error';
+                        this.parentNode.appendChild(errorDiv);
+                    }
+                    errorDiv.textContent = 'Bu e-posta adresi zaten kayıtlı.';
+                } else {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-gray-300');
+                    const errorDiv = this.parentNode.querySelector('.email-error');
+                    if (errorDiv) errorDiv.remove();
+                }
+            });
+        }
+    });
+    
+    // Kullanıcı adı kontrolü
+    usernameInput.addEventListener('blur', function() {
+        const username = this.value;
+        if (username.length >= 3) {
+            fetch('{% url "users:check_username" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: 'username=' + encodeURIComponent(username)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    this.classList.add('border-red-500');
+                    this.classList.remove('border-gray-300');
+                    let errorDiv = this.parentNode.querySelector('.username-error');
+                    if (!errorDiv) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.className = 'mt-1 text-sm text-red-600 username-error';
+                        this.parentNode.appendChild(errorDiv);
+                    }
+                    errorDiv.textContent = 'Bu kullanıcı adı zaten kullanılıyor.';
+                } else {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-gray-300');
+                    const errorDiv = this.parentNode.querySelector('.username-error');
+                    if (errorDiv) errorDiv.remove();
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

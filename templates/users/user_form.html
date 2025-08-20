@@ -1,0 +1,283 @@
+{% extends 'layout/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Cihaz Takip Sistemi{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="space-y-6">
+        <!-- Page Header -->
+        <div class="cyber-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white mb-2">
+                        <i class="fas fa-user-plus mr-3 text-cyan-400"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="text-cyan-400 text-lg">Kullanıcı bilgilerini giriniz</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'users:user_list' %}" class="btn-cyber-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Geri Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Form -->
+        <div class="cyber-card">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Personal Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.username.label }}
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.username.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.tc_kimlik.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.tc_kimlik.label }}
+                        </label>
+                        {{ form.tc_kimlik }}
+                        {% if form.tc_kimlik.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.tc_kimlik.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.first_name.label }}
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.first_name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.last_name.label }}
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.last_name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.email.label }}
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.phone.label }}
+                        </label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.phone.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Role and Permissions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.role.label }}
+                        </label>
+                        {{ form.role }}
+                        {% if form.role.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.role.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.is_active.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.is_active.label }}
+                        </label>
+                        <div class="flex items-center space-x-3">
+                            {{ form.is_active }}
+                            <span class="text-sm text-gray-400">Hesap aktif mi?</span>
+                        </div>
+                        {% if form.is_active.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.is_active.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Profile Image (Edit Mode Only) -->
+                {% if user and user.profile_image %}
+                <div>
+                    <label class="block text-sm font-medium text-cyan-400 mb-2">
+                        Mevcut Profil Resmi
+                    </label>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-cyan-500">
+                            <img src="{{ user.profile_image.url }}" alt="Profil Resmi" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <label for="{{ form.profile_image.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                                {{ form.profile_image.label }}
+                            </label>
+                            {{ form.profile_image }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Password Fields (Add Mode Only) -->
+                {% if not user %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.password1.label }}
+                        </label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.password1.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.password1.help_text %}
+                            <div class="mt-1 text-sm text-gray-400">
+                                {{ form.password1.help_text|safe }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-cyan-400 mb-2">
+                            {{ form.password2.label }}
+                        </label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="mt-1 text-sm text-red-400">
+                                {% for error in form.password2.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-slate-600">
+                    <a href="{% url 'users:user_list' %}" class="btn-cyber-secondary">
+                        <i class="fas fa-times mr-2"></i>
+                        İptal
+                    </a>
+                    <button type="submit" class="btn-cyber-primary">
+                        <i class="fas fa-save mr-2"></i>
+                        {% if user %}Güncelle{% else %}Oluştur{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Form field styling */
+    .cyber-input {
+        @apply w-full px-4 py-3 bg-slate-700 border border-slate-500 text-white placeholder-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent;
+        box-shadow: 0 0 10px var(--glow-cyan);
+    }
+    
+    .cyber-select {
+        @apply w-full px-4 py-3 bg-slate-700 border border-slate-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent;
+        box-shadow: 0 0 10px var(--glow-cyan);
+    }
+    
+    .cyber-checkbox {
+        @apply w-5 h-5 text-cyan-500 bg-slate-700 border-slate-500 rounded focus:ring-cyan-500 focus:ring-2;
+    }
+    
+    .cyber-file {
+        @apply w-full px-4 py-3 bg-slate-700 border border-slate-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent;
+        box-shadow: 0 0 10px var(--glow-cyan);
+    }
+</style>
+
+<script>
+    // Form field validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input, select');
+        
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.classList.add('border-red-500');
+                } else {
+                    this.classList.remove('border-red-500');
+                }
+            });
+        });
+        
+        form.addEventListener('submit', function(e) {
+            let hasErrors = false;
+            
+            inputs.forEach(input => {
+                if (input.hasAttribute('required') && input.value.trim() === '') {
+                    input.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+            });
+            
+            if (hasErrors) {
+                e.preventDefault();
+                alert('Lütfen tüm gerekli alanları doldurun.');
+            }
+        });
+    });
+</script>
+{% endblock %}

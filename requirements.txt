@@ -1,0 +1,31 @@
+# Django ve Core Dependencies
+Django==4.2.23
+djangorestframework==3.14.0
+django-crispy-forms==2.1
+crispy-tailwind==0.5.0
+
+# Database
+psycopg2-binary==2.9.9
+
+# Image Processing
+Pillow==10.1.0
+
+# Development Tools
+python-decouple==3.8
+
+# Production (Optional)
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Security
+django-cors-headers==4.3.1
+
+# Testing
+pytest==7.4.3
+pytest-django==4.7.0
+coverage==7.3.2
+
+# Code Quality
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0

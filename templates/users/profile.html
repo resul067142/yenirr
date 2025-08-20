@@ -1,0 +1,225 @@
+{% extends 'layout/base.html' %}
+{% load user_filters %}
+
+{% block title %}Profil - Cihaz Takip Sistemi{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="space-y-6">
+        <!-- Page Header -->
+        <div class="cyber-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white mb-2">
+                        <i class="fas fa-user mr-3 text-cyan-400"></i>
+                        Profil Bilgileri
+                    </h1>
+                    <p class="text-cyan-400 text-lg">Kişisel bilgilerinizi görüntüleyin ve güncelleyin</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'users:change_password' %}" class="btn-cyber-secondary">
+                        <i class="fas fa-key mr-2"></i>
+                        Şifre Değiştir
+                    </a>
+                    <a href="{% url 'dashboard:home' %}" class="btn-cyber-primary">
+                        <i class="fas fa-home mr-2"></i>
+                        Ana Sayfa
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Image Section -->
+        <div class="cyber-card">
+            <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center">
+                <i class="fas fa-camera mr-2"></i>
+                Profil Resmi
+            </h3>
+            <div class="flex items-center space-x-6">
+                {% if user.profile_image %}
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-cyan-500 cyber-glow">
+                        <img src="{{ user.profile_image.url }}" alt="Profil Resmi" class="w-full h-full object-cover">
+                    </div>
+                {% else %}
+                    <div class="w-24 h-24 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center cyber-glow">
+                        <span class="text-white font-bold text-3xl">{{ user.first_name|first }}{{ user.last_name|first }}</span>
+                    </div>
+                {% endif %}
+                <div class="flex-1">
+                    <p class="text-gray-400 mb-2">Profil resminizi güncellemek için aşağıdaki formu kullanın</p>
+                    <form method="post" enctype="multipart/form-data" class="flex items-center space-x-3">
+                        {% csrf_token %}
+                        <input type="file" name="profile_image" accept="image/*" class="cyber-input flex-1" required>
+                        <button type="submit" name="update_image" class="btn-cyber-primary">
+                            <i class="fas fa-upload mr-2"></i>
+                            Resim Yükle
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Information -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Personal Information -->
+            <div class="cyber-card">
+                <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Kişisel Bilgiler
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">Ad Soyad:</span>
+                        <span class="text-sm text-white">{{ user.get_full_name|default:"Belirtilmemiş" }}</span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">Kullanıcı Adı:</span>
+                        <span class="text-sm text-white font-mono">{{ user.username }}</span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">TC Kimlik:</span>
+                        <span class="text-sm text-white font-mono">{{ user.tc_kimlik }}</span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">E-posta:</span>
+                        <span class="text-sm text-white">{{ user.email|default:"Belirtilmemiş" }}</span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">Telefon:</span>
+                        <span class="text-sm text-white font-mono">{{ user.phone|default:"Belirtilmemiş" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="cyber-card">
+                <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    Hesap Bilgileri
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">Rol:</span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+                            {% if user.role == 'superadmin' %}bg-purple-900 text-purple-300 border border-purple-500
+                            {% elif user.role == 'admin' %}bg-blue-900 text-blue-300 border border-blue-500
+                            {% else %}bg-green-900 text-green-300 border border-green-500{% endif %}">
+                            {% if user.role == 'superadmin' %}
+                                <i class="fas fa-crown mr-1"></i>
+                                Süper Admin
+                            {% elif user.role == 'admin' %}
+                                <i class="fas fa-user-shield mr-1"></i>
+                                Admin
+                            {% else %}
+                                <i class="fas fa-user mr-1"></i>
+                                Kullanıcı
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">Hesap Durumu:</span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+                            {% if user.is_active %}bg-green-900 text-green-300 border border-green-500{% else %}bg-red-900 text-red-300 border border-red-500{% endif %}">
+                            {% if user.is_active %}
+                                <i class="fas fa-check-circle mr-1"></i>
+                                Aktif
+                            {% else %}
+                                <i class="fas fa-times-circle mr-1"></i>
+                                Pasif
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">Son Giriş:</span>
+                        <span class="text-sm text-white font-mono">{{ user.last_login|date:"d.m.Y H:i"|default:"İlk giriş" }}</span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+                        <span class="text-sm font-medium text-gray-400">Kayıt Tarihi:</span>
+                        <span class="text-sm text-white font-mono">{{ user.date_joined|date:"d.m.Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Profile Form -->
+        <div class="cyber-card">
+            <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center">
+                <i class="fas fa-edit mr-2"></i>
+                Profil Güncelle
+            </h3>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="first_name" class="block text-sm font-medium text-cyan-400 mb-2">Ad</label>
+                        <input type="text" name="first_name" id="first_name" value="{{ user.first_name|default:'' }}" class="cyber-input">
+                    </div>
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-cyan-400 mb-2">Soyad</label>
+                        <input type="text" name="last_name" id="last_name" value="{{ user.last_name|default:'' }}" class="cyber-input">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-cyan-400 mb-2">E-posta</label>
+                        <input type="email" name="email" id="email" value="{{ user.email|default:'' }}" class="cyber-input">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-cyan-400 mb-2">Telefon</label>
+                        <input type="tel" name="phone" id="phone" value="{{ user.phone|default:'' }}" class="cyber-input">
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" name="update_profile" class="btn-cyber-primary">
+                        <i class="fas fa-save mr-2"></i>
+                        Güncelle
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- User Statistics (Admin Only) -->
+        {% if user.is_staff %}
+        <div class="cyber-card">
+            <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center">
+                <i class="fas fa-chart-bar mr-2"></i>
+                Kullanıcı İstatistikleri
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 cyber-glow">
+                            <i class="fas fa-mobile-alt text-white text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-400">Toplam Cihaz</p>
+                            <p class="text-2xl font-bold text-white">{{ user.device_set.count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-xl bg-gradient-to-r from-green-500 to-green-600 cyber-glow">
+                            <i class="fas fa-check-circle text-white text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-400">Aktif Cihaz</p>
+                            <p class="text-2xl font-bold text-white">{{ user|active_devices_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 cyber-glow">
+                            <i class="fas fa-calendar text-white text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-400">Üyelik Süresi</p>
+                            <p class="text-2xl font-bold text-white">{{ user.date_joined|timesince }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

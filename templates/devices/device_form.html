@@ -1,0 +1,216 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}
+{% if action == 'add' %}Yeni Cihaz Ekle{% else %}Cihaz Düzenle{% endif %} - Cihaz Takip Sistemi
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="space-y-6">
+        <!-- Page Header -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        {% if action == 'add' %}
+                            <i class="fas fa-plus mr-3 text-blue-600"></i>
+                            Yeni Cihaz Ekle
+                        {% else %}
+                            <i class="fas fa-edit mr-3 text-indigo-600"></i>
+                            Cihaz Düzenle
+                        {% endif %}
+                    </h1>
+                    <p class="text-gray-600 mt-1">
+                        {% if action == 'add' %}
+                            Yeni cihaz bilgilerini girin
+                        {% else %}
+                            Cihaz bilgilerini güncelleyin
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{% url 'devices:device_list' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Geri Dön
+                </a>
+            </div>
+        </div>
+
+        <!-- Device Form -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Cihaz Bilgileri -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.device_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.device_name.label }}
+                        </label>
+                        {{ form.device_name }}
+                        {% if form.device_name.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.device_name.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.device_name.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.device_name.help_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.device_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.device_type.label }}
+                        </label>
+                        {{ form.device_type }}
+                        {% if form.device_type.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.device_type.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- İletişim Bilgileri -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.gsm_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.gsm_number.label }}
+                        </label>
+                        {{ form.gsm_number }}
+                        {% if form.gsm_number.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.gsm_number.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.gsm_number.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.gsm_number.help_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.device_email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.device_email.label }}
+                        </label>
+                        {{ form.device_email }}
+                        {% if form.device_email.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.device_email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.device_email.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.device_email.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Teknik Detaylar -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="{{ form.brand.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.brand.label }}
+                        </label>
+                        {{ form.brand }}
+                        {% if form.brand.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.brand.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.model.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.model.label }}
+                        </label>
+                        {{ form.model }}
+                        {% if form.model.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.model.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.imei.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.imei.label }}
+                        </label>
+                        {{ form.imei }}
+                        {% if form.imei.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {% for error in form.imei.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if form.imei.help_text %}
+                            <p class="mt-1 text-sm text-gray-500">{{ form.imei.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Notlar -->
+                <div>
+                    <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.notes.label }}
+                    </label>
+                    {{ form.notes }}
+                    {% if form.notes.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {% for error in form.notes.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                    <a href="{% url 'devices:device_list' %}" class="btn-secondary">
+                        <i class="fas fa-times mr-2"></i>
+                        İptal
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save mr-2"></i>
+                        {% if action == 'add' %}
+                            Cihaz Ekle
+                        {% else %}
+                            Güncelle
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="bg-blue-50 rounded-lg p-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Bilgilendirme</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li><strong>GSM Numarası:</strong> Türkiye formatında girin (örn: +905551234567 veya 05551234567)</li>
+                            <li><strong>Cihaz E-posta:</strong> Benzersiz olmalıdır, başka bir cihazda kullanılamaz</li>
+                            <li><strong>IMEI:</strong> 15 haneli olmalıdır (opsiyonel)</li>
+                            <li><strong>Marka ve Model:</strong> Cihaz tanımlaması için önerilir</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
