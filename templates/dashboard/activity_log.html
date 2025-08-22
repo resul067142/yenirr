@@ -2,384 +2,781 @@
 
 {% block title %}Aktivite Logları - Cihaz Takip Sistemi{% endblock %}
 
-{% block content %}
-<div class="space-y-6">
-    <!-- Page Header -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    <i class="fas fa-history mr-3 text-blue-600"></i>
-                    Aktivite Logları
-                </h1>
-                <p class="text-gray-600 mt-1">Sistem aktivitelerini ve kullanıcı işlemlerini takip edin</p>
-            </div>
-            <div class="flex space-x-3">
-                <a href="{% url 'dashboard:home' %}" class="btn-primary">
-                    <i class="fas fa-home mr-2"></i>
-                    Ana Sayfa
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filter Form -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtreleme</h3>
-        <form method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-                <label for="log_type" class="block text-sm font-medium text-gray-700 mb-2">Log Türü</label>
-                <select name="log_type" id="log_type" class="form-select w-full">
-                    <option value="">Tümü</option>
-                    <option value="user_login" {% if request.GET.log_type == 'user_login' %}selected{% endif %}>Giriş</option>
-                    <option value="user_register" {% if request.GET.log_type == 'user_register' %}selected{% endif %}>Kayıt</option>
-                    <option value="device_add" {% if request.GET.log_type == 'device_add' %}selected{% endif %}>Cihaz Ekleme</option>
-                    <option value="device_edit" {% if request.GET.log_type == 'device_edit' %}selected{% endif %}>Cihaz Düzenleme</option>
-                    <option value="device_delete" {% if request.GET.log_type == 'device_delete' %}selected{% endif %}>Cihaz Silme</option>
-                    <option value="password_change" {% if request.GET.log_type == 'password_change' %}selected{% endif %}>Şifre Değiştirme</option>
-                    <option value="profile_update" {% if request.GET.log_type == 'profile_update' %}selected{% endif %}>Profil Güncelleme</option>
-                </select>
-            </div>
-            
-            <div>
-                <label for="user" class="block text-sm font-medium text-gray-700 mb-2">Kullanıcı</label>
-                <select name="user" id="user" class="form-select w-full">
-                    <option value="">Tümü</option>
-                    {% for user in users %}
-                    <option value="{{ user.id }}" {% if request.GET.user == user.id|stringformat:"s" %}selected{% endif %}>
-                        {{ user.get_full_name|default:user.username }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div>
-                <label for="date_from" class="block text-sm font-medium text-gray-700 mb-2">Başlangıç Tarihi</label>
-                <input type="date" name="date_from" id="date_from" 
-                       value="{{ request.GET.date_from|default:'' }}"
-                       class="form-input w-full">
-            </div>
-            
-            <div>
-                <label for="date_to" class="block text-sm font-medium text-gray-700 mb-2">Bitiş Tarihi</label>
-                <input type="date" name="date_to" id="date_to" 
-                       value="{{ request.GET.date_to|default:'' }}"
-                       class="form-input w-full">
-            </div>
-            
-            <div class="lg:col-span-4 flex space-x-2">
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-search mr-2"></i>
-                    Filtrele
-                </button>
-                <a href="{% url 'dashboard:activity_log' %}" class="btn-secondary">
-                    <i class="fas fa-times mr-2"></i>
-                    Temizle
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <!-- Statistics Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-list text-white text-sm"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Toplam Log</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ total_logs }}</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-green-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-sign-in-alt text-white text-sm"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Giriş Logları</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ login_logs }}</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-purple-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-mobile-alt text-white text-sm"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Cihaz İşlemleri</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ device_logs }}</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-yellow-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-clock text-white text-sm"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Bugün</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ today_logs }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Activity Logs -->
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Aktivite Listesi</h3>
-        </div>
-        
-        {% if page_obj %}
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <a href="?{% if request.GET.sort == 'created_at' %}-created_at{% else %}created_at{% endif %}&{{ request.GET.urlencode|cut:'sort='|cut:'created_at'|cut:'-created_at'|cut:'&' }}" class="hover:text-gray-700">
-                                Tarih/Saat
-                                {% if request.GET.sort == 'created_at' %}
-                                    <i class="fas fa-sort-up ml-1"></i>
-                                {% elif request.GET.sort == '-created_at' %}
-                                    <i class="fas fa-sort-down ml-1"></i>
-                                {% else %}
-                                    <i class="fas fa-sort ml-1 text-gray-300"></i>
-                                {% endif %}
-                            </a>
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kullanıcı</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlem Türü</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Açıklama</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Adresi</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detay</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for log in page_obj %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ log.created_at|date:"d.m.Y H:i:s" }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8">
-                                    <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <i class="fas fa-user text-blue-600 text-sm"></i>
-                                    </div>
-                                </div>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">
-                                        {{ log.user.get_full_name|default:log.user.username }}
-                                    </div>
-                                    <div class="text-sm text-gray-500">{{ log.user.tc_kimlik }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                {% if log.log_type == 'user_login' %}bg-green-100 text-green-800
-                                {% elif log.log_type == 'user_register' %}bg-blue-100 text-blue-800
-                                {% elif log.log_type == 'device_add' %}bg-purple-100 text-purple-800
-                                {% elif log.log_type == 'device_edit' %}bg-yellow-100 text-yellow-800
-                                {% elif log.log_type == 'device_delete' %}bg-red-100 text-red-800
-                                {% elif log.log_type == 'password_change' %}bg-indigo-100 text-indigo-800
-                                {% elif log.log_type == 'profile_update' %}bg-pink-100 text-pink-800
-                                {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                {% if log.log_type == 'user_login' %}
-                                    <i class="fas fa-sign-in-alt mr-1"></i>
-                                    Giriş
-                                {% elif log.log_type == 'user_register' %}
-                                    <i class="fas fa-user-plus mr-1"></i>
-                                    Kayıt
-                                {% elif log.log_type == 'device_add' %}
-                                    <i class="fas fa-plus mr-1"></i>
-                                    Cihaz Ekleme
-                                {% elif log.log_type == 'device_edit' %}
-                                    <i class="fas fa-edit mr-1"></i>
-                                    Cihaz Düzenleme
-                                {% elif log.log_type == 'device_delete' %}
-                                    <i class="fas fa-trash mr-1"></i>
-                                    Cihaz Silme
-                                {% elif log.log_type == 'password_change' %}
-                                    <i class="fas fa-key mr-1"></i>
-                                    Şifre Değiştirme
-                                {% elif log.log_type == 'profile_update' %}
-                                    <i class="fas fa-user-edit mr-1"></i>
-                                    Profil Güncelleme
-                                {% else %}
-                                    <i class="fas fa-info mr-1"></i>
-                                    {{ log.log_type|title }}
-                                {% endif %}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900">
-                            {{ log.description|truncatechars:50 }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ log.ip_address|default:"-" }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick="showLogDetail({{ log.id }})" class="text-blue-600 hover:text-blue-900">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Pagination -->
-        {% if page_obj.has_other_pages %}
-        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div class="flex-1 flex justify-between sm:hidden">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|cut:'page='|cut:page_obj.previous_page_number|cut:'&' }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Önceki
-                </a>
-                {% endif %}
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|cut:'page='|cut:page_obj.next_page_number|cut:'&' }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Sonraki
-                </a>
-                {% endif %}
-            </div>
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700">
-                        <span class="font-medium">{{ page_obj.start_index }}</span>
-                        -
-                        <span class="font-medium">{{ page_obj.end_index }}</span>
-                        arası gösteriliyor
-                        <span class="font-medium">{{ page_obj.paginator.count }}</span>
-                        kayıttan
-                    </p>
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                        {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|cut:'page='|cut:page_obj.previous_page_number|cut:'&' }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                        {% endif %}
-                        
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
-                                {{ num }}
-                            </span>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <a href="?page={{ num }}&{{ request.GET.urlencode|cut:'page='|cut:num|cut:'&' }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                {{ num }}
-                            </a>
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|cut:'page='|cut:page_obj.next_page_number|cut:'&' }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                        {% endif %}
-                    </nav>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        {% else %}
-        <div class="text-center py-12">
-            <i class="fas fa-history text-4xl text-gray-400 mb-4"></i>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Henüz aktivite logu bulunmuyor</h3>
-            <p class="text-gray-500">Sistem aktiviteleri burada görüntülenecek</p>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Log Detail Modal -->
-<div id="logDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Log Detayı</h3>
-                <button onclick="hideLogDetail()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div id="logDetailContent" class="space-y-3">
-                <!-- Log details will be loaded here -->
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button onclick="hideLogDetail()" class="btn-secondary">
-                    Kapat
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- JavaScript -->
-<script>
-function showLogDetail(logId) {
-    // Bu fonksiyon AJAX ile log detayını yükleyebilir
-    // Şimdilik basit bir örnek gösteriyoruz
-    const modal = document.getElementById('logDetailModal');
-    const content = document.getElementById('logDetailContent');
-    
-    // Örnek içerik (gerçek uygulamada AJAX ile yüklenir)
-    content.innerHTML = `
-        <div class="border-b pb-2">
-            <p class="text-sm font-medium text-gray-500">Log ID</p>
-            <p class="text-sm text-gray-900">#${logId}</p>
-        </div>
-        <div class="border-b pb-2">
-            <p class="text-sm font-medium text-gray-500">Detay</p>
-            <p class="text-sm text-gray-900">Bu log kaydının detaylı bilgileri burada görüntülenecek.</p>
-        </div>
-        <div class="border-b pb-2">
-            <p class="text-sm font-medium text-gray-500">User Agent</p>
-            <p class="text-sm text-gray-900">Tarayıcı bilgileri</p>
-        </div>
-        <div>
-            <p class="text-sm font-medium text-gray-500">IP Adresi</p>
-            <p class="text-sm text-gray-900">127.0.0.1</p>
-        </div>
-    `;
-    
-    modal.classList.remove('hidden');
+{% block extra_css %}
+<style>
+/* Modern Aktivite Logları Tasarımı - Kullanıcı Listesi Stilinde */
+.activity-logs-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 16px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    min-height: 100vh;
 }
 
-function hideLogDetail() {
-    const modal = document.getElementById('logDetailModal');
-    modal.classList.add('hidden');
+/* Compact Header */
+.compact-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Buton Stilleri */
+.btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #10b981, #059669, #3b82f6, #8b5cf6);
+    background-size: 400% 400%;
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    animation: gradientShift 3s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    animation-duration: 1.5s;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #64748b, #475569, #334155, #1e293b);
+    background-size: 400% 400%;
+    color: #e2e8f0;
+    border: 1px solid #64748b;
+    animation: gradientShiftSecondary 4s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-secondary:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    animation-duration: 2s;
+}
+
+@keyframes gradientShiftSecondary {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Hover Panels Section */
+.hover-panels-section {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.hover-panel {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+}
+
+.panel-trigger {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border: 1px solid #6b7280;
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #e2e8f0;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.panel-trigger:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.panel-trigger i:first-child {
+    color: #10b981;
+    font-size: 18px;
+}
+
+.panel-trigger i:last-child {
+    color: #9ca3af;
+    transition: transform 0.3s ease;
+}
+
+.panel-content {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border: 1px solid #6b7280;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.hover-panel:hover .panel-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.hover-panel:hover .panel-trigger i:last-child {
+    transform: rotate(180deg);
+}
+
+/* Compact Stats Grid */
+.compact-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.compact-stat {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.compact-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.compact-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    margin: 0 auto 8px;
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.compact-stat-icon.total {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.compact-stat-icon.today {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.compact-stat-icon.week {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.compact-stat-icon.month {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.compact-stat-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.compact-stat-label {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Filter Panel */
+.filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.form-input, .form-select {
+    padding: 10px 12px;
+    border: 1px solid #6b7280;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #1f2937;
+    color: #ffffff;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #10b981;
+    background: #111827;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+}
+
+/* Aktivite Logları Tablosu */
+.activity-logs-section {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #6b7280;
+}
+
+.activity-logs-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.activity-logs-section h3 i {
+    color: #10b981;
+}
+
+.activity-logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+.activity-logs-table th,
+.activity-logs-table td {
+    padding: 16px 12px;
+    text-align: left;
+    border-bottom: 1px solid #4b5563;
+}
+
+.activity-logs-table th {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.activity-logs-table td {
+    color: #ffffff;
+    vertical-align: middle;
+}
+
+.activity-logs-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.activity-logs-table tbody tr:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+}
+
+.log-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.log-type.login {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.log-type.register {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.log-type.device_add {
+    background: rgba(139, 92, 246, 0.2);
+    color: #8b5cf6;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.log-type.device_edit {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.log-type.device_delete {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.log-type.other {
+    background: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+    border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.log-type i {
+    font-size: 8px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+/* Pagination */
+.pagination-wrapper {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-link {
+    padding: 8px 12px;
+    border: 1px solid #6b7280;
+    border-radius: 6px;
+    color: #e2e8f0;
+    text-decoration: none;
+    transition: all 0.2s;
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+}
+
+.page-link:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+    color: #ffffff;
+}
+
+.page-link.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border-color: #10b981;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hover-panels-section {
+        flex-direction: column;
+    }
+    
+    .hover-panel {
+        min-width: 100%;
+    }
+    
+    .compact-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .activity-logs-table {
+        font-size: 12px;
+    }
+    
+    .activity-logs-table th,
+    .activity-logs-table td {
+        padding: 12px 8px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="activity-logs-container">
+    <!-- Compact Header -->
+    <div class="compact-header">
+        <div class="header-actions">
+            <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">
+                <i class="fas fa-home"></i>
+                Ana Sayfa
+            </a>
+        </div>
+    </div>
+
+    <!-- Hover Panels Section -->
+    <div class="hover-panels-section">
+        <!-- Statistics Hover Panel -->
+        <div class="hover-panel stats-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-chart-bar"></i>
+                <span>Aktivite İstatistikleri</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <div class="compact-stats-grid">
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon total">
+                            <i class="fas fa-list-alt"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ total_logs }}</div>
+                            <div class="compact-stat-label">Toplam</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon today">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ today_logs }}</div>
+                            <div class="compact-stat-label">Bugün</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon week">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ week_logs }}</div>
+                            <div class="compact-stat-label">Bu Hafta</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon month">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ month_logs }}</div>
+                            <div class="compact-stat-label">Bu Ay</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Hover Panel -->
+        <div class="hover-panel filters-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-filter"></i>
+                <span>Arama ve Filtreler</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <form method="get" class="filter-form">
+                    <div class="form-group">
+                        <label class="form-label">Kullanıcı</label>
+                        <input type="text" name="user" class="form-input" placeholder="Kullanıcı adı ara..." value="{{ request.GET.user }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Log Tipi</label>
+                        <select name="log_type" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="login" {% if request.GET.log_type == 'login' %}selected{% endif %}>Giriş</option>
+                            <option value="register" {% if request.GET.log_type == 'register' %}selected{% endif %}>Kayıt</option>
+                            <option value="device_add" {% if request.GET.log_type == 'device_add' %}selected{% endif %}>Cihaz Ekleme</option>
+                            <option value="device_edit" {% if request.GET.log_type == 'device_edit' %}selected{% endif %}>Cihaz Düzenleme</option>
+                            <option value="device_delete" {% if request.GET.log_type == 'device_delete' %}selected{% endif %}>Cihaz Silme</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tarih Aralığı</label>
+                        <select name="date_range" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="today" {% if request.GET.date_range == 'today' %}selected{% endif %}>Bugün</option>
+                            <option value="week" {% if request.GET.date_range == 'week' %}selected{% endif %}>Bu Hafta</option>
+                            <option value="month" {% if request.GET.date_range == 'month' %}selected{% endif %}>Bu Ay</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i>
+                            Ara
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aktivite Logları Tablosu -->
+    <div class="activity-logs-section">
+        <h3>
+            <i class="fas fa-list-alt"></i>
+            Aktivite Logları
+        </h3>
+        
+        <table class="activity-logs-table">
+            <thead>
+                <tr>
+                    <th>Kullanıcı</th>
+                    <th>Log Tipi</th>
+                    <th>Açıklama</th>
+                    <th>IP Adresi</th>
+                    <th>Tarih</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in page_obj %}
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <strong>{{ log.user.username }}</strong>
+                            {% if log.user.email %}
+                                <br><small class="text-slate-400">{{ log.user.email }}</small>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="log-type {{ log.log_type }}">
+                            <i class="fas fa-circle"></i>
+                            {% if log.log_type == 'login' %}Giriş
+                            {% elif log.log_type == 'register' %}Kayıt
+                            {% elif log.log_type == 'device_add' %}Cihaz Ekleme
+                            {% elif log.log_type == 'device_edit' %}Cihaz Düzenleme
+                            {% elif log.log_type == 'device_delete' %}Cihaz Silme
+                            {% else %}Diğer
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="log-description">
+                            {{ log.description|truncatechars:50 }}
+                        </div>
+                    </td>
+                    <td>
+                        <code class="text-xs bg-slate-700 px-2 py-1 rounded">{{ log.ip_address|default:"-" }}</code>
+                    </td>
+                    <td>
+                        <div class="log-date">
+                            <div class="text-sm">{{ log.created_at|date:"d.m.Y" }}</div>
+                            <div class="text-xs text-slate-400">{{ log.created_at|date:"H:i" }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary btn-sm" onclick="showLogDetails('{{ log.id }}')">
+                                <i class="fas fa-eye"></i>
+                                Detay
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteLog('{{ log.id }}')">
+                                <i class="fas fa-trash"></i>
+                                Sil
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;">
+                        <i class="fas fa-list-alt" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                        <div>Henüz aktivite logu bulunmuyor.</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="pagination-wrapper">
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="page-link">İlk</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link">Önceki</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="page-link active">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="page-link">Sonraki</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Son</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Log Details Modal -->
+<div id="logDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-slate-800 border border-slate-600 rounded-lg p-6 max-w-2xl w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-white">Log Detayları</h3>
+                <button onclick="closeLogDetails()" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="logDetailsContent" class="text-slate-300">
+                <!-- Log detayları buraya yüklenecek -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Log detaylarını göster
+function showLogDetails(logId) {
+    fetch(`/api/logs/${logId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('logDetailsContent').innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <strong class="text-white">Kullanıcı:</strong> ${data.user}
+                    </div>
+                    <div>
+                        <strong class="text-white">Log Tipi:</strong> ${data.log_type}
+                    </div>
+                    <div>
+                        <strong class="text-white">Açıklama:</strong> ${data.description}
+                    </div>
+                    <div>
+                        <strong class="text-white">IP Adresi:</strong> ${data.ip_address}
+                    </div>
+                    <div>
+                        <strong class="text-white">User Agent:</strong> ${data.user_agent}
+                    </div>
+                    <div>
+                        <strong class="text-white">Tarih:</strong> ${data.created_at}
+                    </div>
+                </div>
+            `;
+            document.getElementById('logDetailsModal').classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Log detayları yüklenirken hata oluştu.');
+        });
+}
+
+// Log detaylarını kapat
+function closeLogDetails() {
+    document.getElementById('logDetailsModal').classList.add('hidden');
+}
+
+// Log sil
+function deleteLog(logId) {
+    if (confirm('Bu log kaydını silmek istediğinizden emin misiniz?')) {
+        fetch(`/api/logs/${logId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Log silinirken hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Log silinirken hata oluştu.');
+        });
+    }
 }
 
 // Modal dışına tıklandığında kapat
-document.getElementById('logDetailModal').addEventListener('click', function(e) {
+document.getElementById('logDetailsModal').addEventListener('click', function(e) {
     if (e.target === this) {
-        hideLogDetail();
+        closeLogDetails();
     }
 });
 
 // ESC tuşu ile kapat
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        hideLogDetail();
+        closeLogDetails();
     }
 });
 </script>

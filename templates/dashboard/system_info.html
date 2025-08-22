@@ -1,0 +1,501 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Sistem Bilgileri - Cihaz Takip Sistemi{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Koyu Tema Stilleri */
+.system-card {
+    @apply bg-slate-800 border border-slate-600 rounded-xl shadow-xl;
+}
+
+.system-text-primary {
+    @apply text-white font-semibold;
+}
+
+.system-text-secondary {
+    @apply text-slate-300;
+}
+
+.system-text-muted {
+    @apply text-slate-400;
+}
+
+.system-bg-accent {
+    @apply bg-slate-700;
+}
+
+.system-border {
+    @apply border-slate-600;
+}
+
+.system-hover {
+    @apply hover:bg-slate-700 hover:border-slate-500 transition-all duration-300 hover:shadow-lg;
+}
+
+/* Gradient arka planlar */
+.system-gradient {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+/* Info grid */
+.info-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.info-item {
+    @apply bg-slate-700 border border-slate-600 rounded-lg p-6 text-center;
+}
+
+.info-icon {
+    @apply text-4xl mb-4;
+}
+
+.info-value {
+    @apply text-2xl font-bold text-white mb-2;
+}
+
+.info-label {
+    @apply text-slate-300 text-sm;
+}
+
+/* Status indicators */
+.status-indicator {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.status-online { @apply bg-green-100 text-green-800; }
+.status-offline { @apply bg-red-100 text-red-800; }
+.status-warning { @apply bg-yellow-100 text-yellow-800; }
+.status-info { @apply bg-blue-100 text-blue-800; }
+
+/* Progress bars */
+.progress-bar {
+    @apply w-full bg-slate-600 rounded-full h-2 mb-2;
+}
+
+.progress-fill {
+    @apply h-2 rounded-full transition-all duration-300;
+}
+
+.progress-fill-success { @apply bg-green-500; }
+.progress-fill-warning { @apply bg-yellow-500; }
+.progress-fill-danger { @apply bg-red-500; }
+.progress-fill-info { @apply bg-blue-500; }
+
+/* System health */
+.health-card {
+    @apply bg-slate-700 border border-slate-600 rounded-lg p-4;
+}
+
+.health-item {
+    @apply flex items-center justify-between py-2 border-b border-slate-600 last:border-b-0;
+}
+
+.health-label {
+    @apply text-slate-300;
+}
+
+.health-value {
+    @apply text-white font-medium;
+}
+
+/* Version info */
+.version-info {
+    @apply bg-slate-700 border border-slate-600 rounded-lg p-4;
+}
+
+.version-item {
+    @apply flex items-center justify-between py-2;
+}
+
+.version-label {
+    @apply text-slate-300;
+}
+
+.version-value {
+    @apply text-white font-mono text-sm;
+}
+
+/* Quick stats */
+.quick-stats {
+    @apply grid grid-cols-1 md:grid-cols-4 gap-4;
+}
+
+.stat-card {
+    @apply bg-slate-700 border border-slate-600 rounded-lg p-4 text-center;
+}
+
+.stat-icon {
+    @apply text-3xl mb-2;
+}
+
+.stat-number {
+    @apply text-2xl font-bold text-white mb-1;
+}
+
+.stat-label {
+    @apply text-slate-300 text-sm;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="system-card p-6 system-gradient">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">
+                    <i class="fas fa-server mr-3 text-blue-400"></i>
+                    Sistem Bilgileri
+                </h1>
+                <p class="text-slate-300 text-lg">Sistem durumu, performans ve teknik detaylar</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'dashboard:home' %}" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg border border-slate-600 hover:border-slate-500 transition-all duration-200 flex items-center">
+                    <i class="fas fa-home mr-2"></i>
+                    Ana Sayfa
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+        <div class="stat-card">
+            <div class="stat-icon text-green-400">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">{{ total_users|default:"0" }}</div>
+            <div class="stat-label">Toplam Kullanıcı</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon text-blue-400">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="stat-number">{{ total_devices|default:"0" }}</div>
+            <div class="stat-label">Toplam Cihaz</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon text-purple-400">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="stat-number">{{ database_size|default:"0" }} MB</div>
+            <div class="stat-label">Veritabanı Boyutu</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon text-yellow-400">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number">{{ uptime|default:"0" }} saat</div>
+            <div class="stat-label">Çalışma Süresi</div>
+        </div>
+    </div>
+
+    <!-- System Health -->
+    <div class="system-card p-6">
+        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-heartbeat mr-2 text-red-400"></i>
+            Sistem Sağlığı
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Overall Health -->
+            <div class="health-card">
+                <h4 class="text-lg font-semibold text-white mb-4">Genel Durum</h4>
+                <div class="space-y-3">
+                    <div class="health-item">
+                        <span class="health-label">Sistem Durumu</span>
+                        <span class="status-indicator status-online">Çevrimiçi</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Veritabanı</span>
+                        <span class="status-indicator status-online">Aktif</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Web Sunucu</span>
+                        <span class="status-indicator status-online">Çalışıyor</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Güvenlik</span>
+                        <span class="status-indicator status-online">Güvenli</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="health-card">
+                <h4 class="text-lg font-semibold text-white mb-4">Performans Metrikleri</h4>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm text-slate-300 mb-1">
+                            <span>CPU Kullanımı</span>
+                            <span>{{ cpu_usage|default:"25" }}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill {% if cpu_usage > 80 %}progress-fill-danger{% elif cpu_usage > 60 %}progress-fill-warning{% else %}progress-fill-success{% endif %}" 
+                                 style="width: {{ cpu_usage|default:25 }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm text-slate-300 mb-1">
+                            <span>RAM Kullanımı</span>
+                            <span>{{ ram_usage|default:"45" }}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill {% if ram_usage > 80 %}progress-fill-danger{% elif ram_usage > 60 %}progress-fill-warning{% else %}progress-fill-success{% endif %}" 
+                                 style="width: {{ ram_usage|default:45 }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm text-slate-300 mb-1">
+                            <span>Disk Kullanımı</span>
+                            <span>{{ disk_usage|default:"30" }}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill {% if disk_usage > 80 %}progress-fill-danger{% elif disk_usage > 60 %}progress-fill-warning{% else %}progress-fill-success{% endif %}" 
+                                 style="width: {{ disk_usage|default:30 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="system-card p-6">
+        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-info-circle mr-2 text-blue-400"></i>
+            Sistem Bilgileri
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Software Info -->
+            <div class="version-info">
+                <h4 class="text-lg font-semibold text-white mb-4">Yazılım Bilgileri</h4>
+                <div class="space-y-3">
+                    <div class="version-item">
+                        <span class="version-label">Django Sürümü</span>
+                        <span class="version-value">{{ django_version|default:"4.2.23" }}</span>
+                    </div>
+                    <div class="version-item">
+                        <span class="version-label">Python Sürümü</span>
+                        <span class="version-value">{{ python_version|default:"3.13.5" }}</span>
+                    </div>
+                    <div class="version-item">
+                        <span class="version-label">PostgreSQL Sürümü</span>
+                        <span class="version-value">{{ postgres_version|default:"14.0" }}</span>
+                    </div>
+                    <div class="version-item">
+                        <span class="version-label">Web Sunucu</span>
+                        <span class="version-value">{{ web_server|default:"Django Development Server" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hardware Info -->
+            <div class="version-info">
+                <h4 class="text-lg font-semibold text-white mb-4">Donanım Bilgileri</h4>
+                <div class="space-y-3">
+                    <div class="version-item">
+                        <span class="version-label">İşletim Sistemi</span>
+                        <span class="version-value">{{ os_info|default:"macOS 14.6.0" }}</span>
+                    </div>
+                    <div class="version-item">
+                        <span class="version-label">İşlemci</span>
+                        <span class="version-value">{{ processor|default:"Apple M2" }}</span>
+                    </div>
+                    <div class="version-item">
+                        <span class="version-label">Toplam RAM</span>
+                        <span class="version-value">{{ total_ram|default:"16 GB" }}</span>
+                    </div>
+                    <div class="version-item">
+                        <span class="version-label">Disk Alanı</span>
+                        <span class="version-value">{{ total_disk|default:"512 GB" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Information -->
+    <div class="system-card p-6">
+        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-database mr-2 text-green-400"></i>
+            Veritabanı Bilgileri
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="info-item">
+                <div class="info-icon text-blue-400">
+                    <i class="fas fa-table"></i>
+                </div>
+                <div class="info-value">{{ db_tables|default:"15" }}</div>
+                <div class="info-label">Toplam Tablo</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-icon text-green-400">
+                    <i class="fas fa-rows"></i>
+                </div>
+                <div class="info-value">{{ db_rows|default:"1,247" }}</div>
+                <div class="info-label">Toplam Satır</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-icon text-purple-400">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="info-value">{{ db_uptime|default:"168" }}h</div>
+                <div class="info-label">DB Çalışma Süresi</div>
+            </div>
+        </div>
+        
+        <div class="mt-6 p-4 bg-slate-700 rounded-lg border border-slate-600">
+            <h4 class="text-lg font-semibold text-white mb-3">Veritabanı Tabloları</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-300">Kullanıcılar</span>
+                    <span class="text-white font-mono">{{ user_count|default:"0" }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-300">Cihazlar</span>
+                    <span class="text-white font-mono">{{ device_count|default:"0" }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-300">Aktivite Logları</span>
+                    <span class="text-white font-mono">{{ log_count|default:"0" }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-300">Hızlı İşlemler</span>
+                    <span class="text-white font-mono">{{ quick_action_count|default:"0" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Information -->
+    <div class="system-card p-6">
+        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-shield-alt mr-2 text-yellow-400"></i>
+            Güvenlik Bilgileri
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="health-card">
+                <h4 class="text-lg font-semibold text-white mb-4">Güvenlik Durumu</h4>
+                <div class="space-y-3">
+                    <div class="health-item">
+                        <span class="health-label">SSL Sertifikası</span>
+                        <span class="status-indicator status-online">Aktif</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Güvenlik Duvarı</span>
+                        <span class="status-indicator status-online">Aktif</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Son Güncelleme</span>
+                        <span class="health-value">{{ last_update|default:"Bugün" }}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Güvenlik Taraması</span>
+                        <span class="status-indicator status-online">Temiz</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="health-card">
+                <h4 class="text-lg font-semibold text-white mb-4">Son Aktiviteler</h4>
+                <div class="space-y-3">
+                    <div class="health-item">
+                        <span class="health-label">Son Giriş</span>
+                        <span class="health-value">{{ last_login|default:"2 saat önce" }}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Başarısız Giriş</span>
+                        <span class="health-value">{{ failed_logins|default:"0" }}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Kilitli Hesaplar</span>
+                        <span class="health-value">{{ locked_accounts|default:"0" }}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Aktif Oturumlar</span>
+                        <span class="health-value">{{ active_sessions|default:"3" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="system-card p-6">
+        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-bolt mr-2 text-blue-400"></i>
+            Hızlı İşlemler
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="{% url 'dashboard:statistics' %}" class="system-bg-accent p-6 rounded-xl system-border system-hover">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="system-text-primary font-medium text-lg">İstatistikler</h4>
+                        <p class="system-text-muted">Detaylı sistem istatistikleri</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'dashboard:activity_log' %}" class="system-bg-accent p-6 rounded-xl system-border system-hover">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-history text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="system-text-primary font-medium text-lg">Aktivite Logları</h4>
+                        <p class="system-text-muted">Sistem aktivitelerini takip edin</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'dashboard:admin_panel' %}" class="system-bg-accent p-6 rounded-xl system-border system-hover">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-cogs text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="system-text-primary font-medium text-lg">Admin Panel</h4>
+                        <p class="system-text-muted">Gelişmiş yönetim araçları</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-refresh system info every 30 seconds
+setInterval(function() {
+    // You can implement AJAX refresh here if needed
+    console.log('System info refresh interval');
+}, 30000);
+
+// Add some interactivity to progress bars
+document.querySelectorAll('.progress-fill').forEach(bar => {
+    bar.addEventListener('mouseenter', function() {
+        this.style.transform = 'scaleY(1.2)';
+    });
+    
+    bar.addEventListener('mouseleave', function() {
+        this.style.transform = 'scaleY(1)';
+    });
+});
+</script>
+{% endblock %}

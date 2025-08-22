@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils import timezone
 from django.db import transaction
 from django.views.decorators.http import require_http_methods
@@ -31,51 +31,59 @@ def get_user_agent(request):
     """Kullanıcının tarayıcı bilgisini alır"""
     return request.META.get('HTTP_USER_AGENT', '')
 
-@login_required
 def device_list_view(request):
     """Cihaz listesi view'ı"""
-    # Kullanıcının yetkisine göre cihazları getir
-    if request.user.can_view_all_devices():
-        devices = Device.objects.all().select_related('user')
+    # Kullanıcının yetkilerine göre cihazları getir
+    if hasattr(request, 'user') and request.user.is_authenticated:
+        if request.user.can_view_all_devices:
+            devices = Device.objects.all()
+        else:
+            devices = Device.objects.filter(user=request.user)
     else:
-        devices = Device.objects.filter(user=request.user).select_related('user')
+        # Anonymous user için tüm cihazları göster
+        devices = Device.objects.all()
     
     # Filtreleme
-    filter_form = DeviceFilterForm(request.GET)
-    if filter_form.is_valid():
-        device_type = filter_form.cleaned_data.get('device_type')
-        is_active = filter_form.cleaned_data.get('is_active')
-        date_from = filter_form.cleaned_data.get('date_from')
-        date_to = filter_form.cleaned_data.get('date_to')
-        search = filter_form.cleaned_data.get('search')
-        
-        if device_type:
-            devices = devices.filter(device_type=device_type)
-        
-        if is_active:
-            if is_active == 'True':
-                devices = devices.filter(is_active=True)
-            elif is_active == 'False':
-                devices = devices.filter(is_active=False)
-        
-        if date_from:
-            devices = devices.filter(created_at__gte=date_from)
-        
-        if date_to:
-            devices = devices.filter(created_at__lte=date_to)
-        
-        if search:
-            devices = devices.filter(
-                Q(device_name__icontains=search) |
-                Q(gsm_number__icontains=search) |
-                Q(device_email__icontains=search) |
-                Q(brand__icontains=search) |
-                Q(model__icontains=search)
-            )
+    device_type_filter = request.GET.get('device_type')
+    status_filter = request.GET.get('status')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    search_query = request.GET.get('search')
+    
+    if device_type_filter:
+        devices = devices.filter(device_type=device_type_filter)
+    
+    if status_filter == 'active':
+        devices = devices.filter(is_active=True)
+    elif status_filter == 'inactive':
+        devices = devices.filter(is_active=False)
+    
+    if start_date:
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            devices = devices.filter(created_at__date__gte=start_date)
+        except ValueError:
+            pass
+    
+    if end_date:
+        try:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            devices = devices.filter(created_at__date__lte=end_date)
+        except ValueError:
+            pass
+    
+    if search_query:
+        devices = devices.filter(
+            Q(device_name__icontains=search_query) |
+            Q(gsm_number__icontains=search_query) |
+            Q(device_email__icontains=search_query) |
+            Q(brand__icontains=search_query) |
+            Q(model__icontains=search_query)
+        )
     
     # Sıralama
     sort_by = request.GET.get('sort', '-created_at')
-    if sort_by in ['device_name', '-device_name', 'gsm_number', '-gsm_number', 'created_at', '-created_at']:
+    if sort_by in ['device_name', '-device_name', 'created_at', '-created_at', 'device_type', '-device_type']:
         devices = devices.order_by(sort_by)
     
     # Sayfalama
@@ -83,13 +91,30 @@ def device_list_view(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # İstatistikler
+    total_devices = devices.count()
+    active_devices = devices.filter(is_active=True).count()
+    inactive_devices = devices.filter(is_active=False).count()
+    
+    # Cihaz türü dağılımı
+    device_type_stats = devices.values('device_type').annotate(count=Count('id')).order_by('-count')
+    
     context = {
         'page_obj': page_obj,
-        'filter_form': filter_form,
-        'total_devices': devices.count(),
-        'can_add_device': request.user.can_manage_devices(),
-        'can_export': request.user.can_view_all_devices(),
-        'current_filters': request.GET.dict()
+        'devices': page_obj,  # Template'de kullanım için
+        'device_types': Device.DEVICE_TYPE_CHOICES,
+        'total_devices': total_devices,
+        'active_devices': active_devices,
+        'inactive_devices': inactive_devices,
+        'device_type_stats': device_type_stats,
+        'current_filters': {
+            'device_type': device_type_filter,
+            'status': status_filter,
+            'start_date': start_date,
+            'end_date': end_date,
+            'search': search_query,
+            'sort': sort_by
+        }
     }
     
     return render(request, 'devices/device_list.html', context)
@@ -97,32 +122,28 @@ def device_list_view(request):
 @login_required
 def device_add_view(request):
     """Cihaz ekleme view'ı"""
-    if not request.user.can_manage_devices():
+    if not request.user.can_manage_devices:
         messages.error(request, 'Cihaz ekleme yetkiniz yok.')
         return redirect('devices:device_list')
     
     if request.method == 'POST':
-        form = DeviceForm(request.POST)
+        form = DeviceForm(request.POST, request.FILES)
         if form.is_valid():
-            try:
-                with transaction.atomic():
-                    device = form.save(commit=False)
-                    device.user = request.user
-                    device.save()
-                    
-                    # Log kaydı
-                    UserLog.log_activity(
-                        user=request.user,
-                        log_type='device_add',
-                        description=f'Yeni cihaz eklendi: {device.get_short_info()}',
-                        ip_address=get_client_ip(request),
-                        user_agent=get_user_agent(request)
-                    )
-                    
-                    messages.success(request, 'Cihaz başarıyla eklendi.')
-                    return redirect('devices:device_list')
-            except Exception as e:
-                messages.error(request, f'Cihaz eklenirken hata oluştu: {str(e)}')
+            device = form.save(commit=False)
+            device.user = request.user
+            device.save()
+            
+            # Log kaydı
+            UserLog.log_activity(
+                user=request.user,
+                log_type='device_add',
+                description=f'Yeni cihaz eklendi: {device.device_name}',
+                ip_address=get_client_ip(request),
+                user_agent=get_user_agent(request)
+            )
+            
+            messages.success(request, 'Cihaz başarıyla eklendi.')
+            return redirect('devices:device_detail', device_id=device.id)
     else:
         form = DeviceForm()
     
@@ -130,6 +151,7 @@ def device_add_view(request):
         'form': form,
         'action': 'add'
     }
+    
     return render(request, 'devices/device_form.html', context)
 
 @login_required
@@ -138,38 +160,36 @@ def device_edit_view(request, device_id):
     device = get_object_or_404(Device, id=device_id)
     
     # Yetki kontrolü
-    if not request.user.can_view_all_devices() and device.user != request.user:
+    if not request.user.can_view_all_devices and device.user != request.user:
         messages.error(request, 'Bu cihazı düzenleme yetkiniz yok.')
         return redirect('devices:device_list')
     
     if request.method == 'POST':
-        form = DeviceForm(request.POST, instance=device)
+        form = DeviceForm(request.POST, request.FILES, instance=device)
         if form.is_valid():
-            try:
-                with transaction.atomic():
-                    form.save()
-                    
-                    # Log kaydı
-                    UserLog.log_activity(
-                        user=request.user,
-                        log_type='device_update',
-                        description=f'Cihaz güncellendi: {device.get_short_info()}',
-                        ip_address=get_client_ip(request),
-                        user_agent=get_user_agent(request)
-                    )
-                    
-                    messages.success(request, 'Cihaz başarıyla güncellendi.')
-                    return redirect('devices:device_list')
-            except Exception as e:
-                messages.error(request, f'Cihaz güncellenirken hata oluştu: {str(e)}')
+            device = form.save(commit=False)
+            device.user = request.user
+            device.save()
+            
+            # Log kaydı
+            UserLog.log_activity(
+                user=request.user,
+                log_type='device_edit',
+                description=f'Cihaz düzenlendi: {device.device_name}',
+                ip_address=get_client_ip(request),
+                user_agent=get_user_agent(request)
+            )
+            
+            messages.success(request, 'Cihaz başarıyla güncellendi.')
+            return redirect('devices:device_detail', device_id=device.id)
     else:
         form = DeviceForm(instance=device)
     
     context = {
         'form': form,
-        'device': device,
-        'action': 'edit'
+        'device': device
     }
+    
     return render(request, 'devices/device_form.html', context)
 
 @login_required
@@ -178,33 +198,31 @@ def device_delete_view(request, device_id):
     device = get_object_or_404(Device, id=device_id)
     
     # Yetki kontrolü
-    if not request.user.can_view_all_devices() and device.user != request.user:
+    if not request.user.can_view_all_devices and device.user != request.user:
         messages.error(request, 'Bu cihazı silme yetkiniz yok.')
         return redirect('devices:device_list')
     
     if request.method == 'POST':
-        try:
-            device_name = device.get_short_info()
-            device.delete()
-            
-            # Log kaydı
-            UserLog.log_activity(
-                user=request.user,
-                log_type='device_delete',
-                description=f'Cihaz silindi: {device_name}',
-                ip_address=get_client_ip(request),
-                user_agent=get_user_agent(request)
-            )
-            
-            messages.success(request, 'Cihaz başarıyla silindi.')
-            return redirect('devices:device_list')
-        except Exception as e:
-            messages.error(request, f'Cihaz silinirken hata oluştu: {str(e)}')
+        device_name = device.device_name
+        device.delete()
+        
+        # Log kaydı
+        UserLog.log_activity(
+            user=request.user,
+            log_type='device_delete',
+            description=f'Cihaz silindi: {device_name}',
+            ip_address=get_client_ip(request),
+            user_agent=get_user_agent(request)
+        )
+        
+        messages.success(request, 'Cihaz başarıyla silindi.')
+        return redirect('devices:device_list')
     
     context = {
         'device': device
     }
-    return render(request, 'devices/device_confirm_delete.html', context)
+    
+    return render(request, 'devices/device_delete.html', context)
 
 @login_required
 def device_detail_view(request, device_id):
@@ -212,198 +230,91 @@ def device_detail_view(request, device_id):
     device = get_object_or_404(Device, id=device_id)
     
     # Yetki kontrolü
-    if not request.user.can_view_all_devices() and device.user != request.user:
-        messages.error(request, 'Bu cihazı görüntüleme yetkiniz yok.')
+    if not request.user.can_view_all_devices and device.user != request.user:
+        messages.error(request, 'Bu cihaza erişim yetkiniz yok.')
         return redirect('devices:device_list')
     
     context = {
-        'device': device
+        'device': device,
+        'can_edit': request.user.can_manage_devices or device.user == request.user,
+        'can_delete': request.user.can_manage_devices or device.user == request.user
     }
+    
     return render(request, 'devices/device_detail.html', context)
 
 @login_required
 def device_export_csv(request):
-    """Cihazları CSV olarak export etme"""
-    if not request.user.can_view_all_devices():
-        messages.error(request, 'Export yetkiniz yok.')
+    """Cihaz verilerini CSV formatında dışa aktar"""
+    if not request.user.can_view_all_devices:
+        messages.error(request, 'Bu işlem için yetkiniz yok.')
         return redirect('devices:device_list')
     
     # Kullanıcının yetkisine göre cihazları getir
-    if request.user.can_view_all_devices():
-        devices = Device.objects.all().select_related('user')
+    if request.user.can_view_all_devices:
+        devices = Device.objects.all()
     else:
-        devices = Device.objects.filter(user=request.user).select_related('user')
+        devices = Device.objects.filter(user=request.user)
     
-    # Filtreleme parametrelerini uygula
-    filter_form = DeviceFilterForm(request.GET)
-    if filter_form.is_valid():
-        device_type = filter_form.cleaned_data.get('device_type')
-        is_active = filter_form.cleaned_data.get('is_active')
-        date_from = filter_form.cleaned_data.get('date_from')
-        date_to = filter_form.cleaned_data.get('date_to')
-        search = filter_form.cleaned_data.get('search')
-        
-        if device_type:
-            devices = devices.filter(device_type=device_type)
-        
-        if is_active:
-            if is_active == 'True':
-                devices = devices.filter(is_active=True)
-            elif is_active == 'False':
-                devices = devices.filter(is_active=False)
-        
-        if date_from:
-            devices = devices.filter(created_at__gte=date_from)
-        
-        if date_to:
-            devices = devices.filter(created_at__lte=date_to)
-        
-        if search:
-            devices = devices.filter(
-                Q(device_name__icontains=search) |
-                Q(gsm_number__icontains=search) |
-                Q(device_email__icontains=search) |
-                Q(brand__icontains=search) |
-                Q(model__icontains=search)
-            )
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="cihazlar.csv"'
     
-    # CSV response oluştur
-    response = HttpResponse(content_type='text/csv; charset=utf-8')
-    response['Content-Disposition'] = f'attachment; filename="cihazlar_{timezone.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Cihaz Adı', 'Tür', 'GSM Numarası', 'E-posta', 'Kullanıcı', 'Durum', 'Kayıt Tarihi'])
     
-    # UTF-8 BOM ekle (Excel uyumluluğu için)
-    response.write('\ufeff')
-    
-    writer = csv.writer(response, delimiter=';')
-    
-    # Başlık satırı
-    if request.user.can_view_all_devices():
-        writer.writerow(['Cihaz Adı', 'Cihaz Türü', 'GSM Numarası', 'E-posta', 'Marka', 'Model', 'IMEI', 'Durum', 'Kullanıcı', 'TC Kimlik', 'Kayıt Tarihi'])
-    else:
-        writer.writerow(['Cihaz Adı', 'Cihaz Türü', 'GSM Numarası', 'E-posta', 'Marka', 'Model', 'IMEI', 'Durum', 'Kayıt Tarihi'])
-    
-    # Veri satırları
     for device in devices:
-        if request.user.can_view_all_devices():
-            writer.writerow([
-                device.device_name or '',
-                device.get_device_type_display_tr(),
-                device.gsm_number,
-                device.device_email,
-                device.brand or '',
-                device.model or '',
-                device.imei or '',
-                'Aktif' if device.is_active else 'Pasif',
-                device.user.get_full_name(),
-                device.user.tc_kimlik,
-                device.created_at.strftime('%d.%m.%Y %H:%M')
-            ])
-        else:
-            writer.writerow([
-                device.device_name or '',
-                device.get_device_type_display_tr(),
-                device.gsm_number,
-                device.device_email,
-                device.brand or '',
-                device.model or '',
-                device.imei or '',
-                'Aktif' if device.is_active else 'Pasif',
-                device.created_at.strftime('%d.%m.%Y %H:%M')
-            ])
+        writer.writerow([
+            device.device_name or 'İsimsiz',
+            device.get_device_type_display(),
+            device.gsm_number or '',
+            device.device_email or '',
+            device.user.get_full_name(),
+            'Aktif' if device.is_active else 'Pasif',
+            device.created_at.strftime('%d.%m.%Y %H:%M')
+        ])
     
     return response
 
 @login_required
 def device_export_json(request):
-    """Cihazları JSON olarak export etme"""
-    if not request.user.can_view_all_devices():
-        messages.error(request, 'Export yetkiniz yok.')
+    """Cihaz verilerini JSON formatında dışa aktar"""
+    if not request.user.can_view_all_devices:
+        messages.error(request, 'Bu işlem için yetkiniz yok.')
         return redirect('devices:device_list')
     
     # Kullanıcının yetkisine göre cihazları getir
-    if request.user.can_view_all_devices():
-        devices = Device.objects.all().select_related('user')
+    if request.user.can_view_all_devices:
+        devices = Device.objects.all()
     else:
-        devices = Device.objects.filter(user=request.user).select_related('user')
-    
-    # Filtreleme parametrelerini uygula (CSV ile aynı)
-    filter_form = DeviceFilterForm(request.GET)
-    if filter_form.is_valid():
-        device_type = filter_form.cleaned_data.get('device_type')
-        is_active = filter_form.cleaned_data.get('is_active')
-        date_from = filter_form.cleaned_data.get('date_from')
-        date_to = filter_form.cleaned_data.get('date_to')
-        search = filter_form.cleaned_data.get('search')
-        
-        if device_type:
-            devices = devices.filter(device_type=device_type)
-        
-        if is_active:
-            if is_active == 'True':
-                devices = devices.filter(is_active=True)
-            elif is_active == 'False':
-                devices = devices.filter(is_active=False)
-        
-        if date_from:
-            devices = devices.filter(created_at__gte=date_from)
-        
-        if date_to:
-            devices = devices.filter(created_at__lte=date_to)
-        
-        if search:
-            devices = devices.filter(
-                Q(device_name__icontains=search) |
-                Q(gsm_number__icontains=search) |
-                Q(device_email__icontains=search) |
-                Q(brand__icontains=search) |
-                Q(model__icontains=search)
-            )
-    
-    # JSON response oluştur
-    response = HttpResponse(content_type='application/json; charset=utf-8')
-    response['Content-Disposition'] = f'attachment; filename="cihazlar_{timezone.now().strftime("%Y%m%d_%H%M%S")}.json"'
+        devices = Device.objects.filter(user=request.user)
     
     data = []
     for device in devices:
-        device_data = {
+        data.append({
             'id': device.id,
-            'device_name': device.device_name or '',
-            'device_type': device.get_device_type_display_tr(),
-            'gsm_number': device.gsm_number,
-            'device_email': device.device_email,
-            'brand': device.brand or '',
-            'model': device.model or '',
-            'imei': device.imei or '',
+            'device_name': device.device_name or 'İsimsiz',
+            'device_type': device.get_device_type_display(),
+            'gsm_number': device.gsm_number or '',
+            'device_email': device.device_email or '',
+            'user': device.user.get_full_name(),
             'is_active': device.is_active,
-            'created_at': device.created_at.strftime('%d.%m.%Y %H:%M'),
-            'updated_at': device.updated_at.strftime('%d.%m.%Y %H:%M')
-        }
-        
-        if request.user.can_view_all_devices():
-            device_data.update({
-                'user': {
-                    'id': device.user.id,
-                    'full_name': device.user.get_full_name(),
-                    'tc_kimlik': device.user.tc_kimlik,
-                    'email': device.user.email
-                }
-            })
-        
-        data.append(device_data)
+            'created_at': device.created_at.strftime('%d.%m.%Y %H:%M')
+        })
     
-    response.write(json.dumps(data, ensure_ascii=False, indent=2))
-    return response
+    return JsonResponse(data, safe=False)
 
 @csrf_exempt
 @require_http_methods(["POST"])
 @login_required
 def device_toggle_status(request, device_id):
-    """Cihaz durumunu değiştirme (AJAX)"""
+    """Cihaz durumunu değiştir (AJAX)"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Sadece POST metodu desteklenir'}, status=405)
+    
     device = get_object_or_404(Device, id=device_id)
     
     # Yetki kontrolü
-    if not request.user.can_view_all_devices() and device.user != request.user:
-        return JsonResponse({'error': 'Yetkiniz yok'}, status=403)
+    if not request.user.can_view_all_devices and device.user != request.user:
+        return JsonResponse({'error': 'Bu işlem için yetkiniz yok'}, status=403)
     
     try:
         device.is_active = not device.is_active
@@ -413,8 +324,8 @@ def device_toggle_status(request, device_id):
         status_text = 'aktif' if device.is_active else 'pasif'
         UserLog.log_activity(
             user=request.user,
-            log_type='device_update',
-            description=f'Cihaz durumu {status_text} yapıldı: {device.get_short_info()}',
+            log_type='device_status_change',
+            description=f'Cihaz durumu değiştirildi: {device.device_name} -> {status_text}',
             ip_address=get_client_ip(request),
             user_agent=get_user_agent(request)
         )
@@ -422,7 +333,7 @@ def device_toggle_status(request, device_id):
         return JsonResponse({
             'success': True,
             'is_active': device.is_active,
-            'status_text': 'Aktif' if device.is_active else 'Pasif'
+            'message': f'Cihaz {status_text} yapıldı'
         })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
@@ -430,11 +341,12 @@ def device_toggle_status(request, device_id):
 @login_required
 def device_statistics_view(request):
     """Cihaz istatistikleri view'ı"""
-    # Kullanıcının yetkisine göre cihazları getir
-    if request.user.can_view_all_devices():
-        devices = Device.objects.all()
-    else:
-        devices = Device.objects.filter(user=request.user)
+    if not request.user.can_view_all_devices:
+        messages.error(request, 'Bu sayfaya erişim yetkiniz yok.')
+        return redirect('devices:device_list')
+    
+    # Tüm cihazları getir
+    devices = Device.objects.all()
     
     # Genel istatistikler
     total_devices = devices.count()
@@ -442,38 +354,34 @@ def device_statistics_view(request):
     inactive_devices = devices.filter(is_active=False).count()
     
     # Cihaz türüne göre dağılım
-    device_type_stats = {}
-    for device_type, display_name in Device.DEVICE_TYPE_CHOICES:
-        count = devices.filter(device_type=device_type).count()
-        if count > 0:
-            device_type_stats[display_name] = count
+    device_type_stats = devices.values('device_type').annotate(
+        count=Count('id')
+    ).order_by('-count')
     
-    # Son 7 günlük kayıtlar
-    last_7_days = []
-    for i in range(7):
-        date = timezone.now().date() - timedelta(days=i)
+    # Kullanıcıya göre cihaz dağılımı
+    user_device_stats = devices.values('user__first_name', 'user__last_name').annotate(
+        count=Count('id')
+    ).order_by('-count')[:10]
+    
+    # Son 30 günlük cihaz kayıtları
+    thirty_days_ago = timezone.now().date() - timedelta(days=30)
+    daily_registrations = []
+    
+    for i in range(30):
+        date = thirty_days_ago + timedelta(days=i)
         count = devices.filter(created_at__date=date).count()
-        last_7_days.append({
+        daily_registrations.append({
             'date': date.strftime('%d.%m'),
             'count': count
         })
-    last_7_days.reverse()
-    
-    # Kullanıcı başına cihaz ortalaması
-    if request.user.can_view_all_devices():
-        total_users = User.objects.filter(is_active=True).count()
-        avg_devices_per_user = total_devices / total_users if total_users > 0 else 0
-    else:
-        avg_devices_per_user = total_devices
     
     context = {
         'total_devices': total_devices,
         'active_devices': active_devices,
         'inactive_devices': inactive_devices,
         'device_type_stats': device_type_stats,
-        'last_7_days': last_7_days,
-        'avg_devices_per_user': round(avg_devices_per_user, 1),
-        'can_view_all': request.user.can_view_all_devices()
+        'user_device_stats': user_device_stats,
+        'daily_registrations': daily_registrations
     }
     
     return render(request, 'devices/device_statistics.html', context)

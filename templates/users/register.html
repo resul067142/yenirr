@@ -1,302 +1,432 @@
 {% extends 'layout/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block title %}Kayıt Ol - Cihaz Takip Sistemi{% endblock %}
 
 {% block auth_content %}
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <!-- Logo ve Başlık -->
-        <div class="text-center">
-            <div class="mx-auto h-20 w-20 bg-green-600 rounded-full flex items-center justify-center mb-6">
-                <i class="fas fa-user-plus text-white text-3xl"></i>
-            </div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Hesap Oluştur</h2>
-            <p class="text-gray-600">Cihaz Takip Sistemi'ne katılın</p>
+<!-- Cyberpunk Register Screen -->
+<div class="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Background Devices (Blurred) -->
+    <div class="absolute inset-0 overflow-hidden">
+        <!-- Smartphone -->
+        <div class="absolute top-20 left-10 w-32 h-64 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl blur-xl transform rotate-12 animate-float-slow"></div>
+        
+        <!-- Tablet -->
+        <div class="absolute top-40 right-20 w-48 h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl transform -rotate-12 animate-float-medium"></div>
+        
+        <!-- Digital Camera -->
+        <div class="absolute bottom-32 left-1/4 w-24 h-20 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-xl transform rotate-45 animate-float-fast"></div>
+        
+        <!-- Laptop -->
+        <div class="absolute bottom-20 right-1/3 w-40 h-24 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-lg blur-xl transform -rotate-6 animate-float-slow"></div>
+    </div>
+
+    <!-- Matrix Code Rain Effect -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="matrix-rain-purple"></div>
+    </div>
+
+    <!-- Digital Network Lines -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <!-- Network Grid -->
+            <defs>
+                <pattern id="grid-purple" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(139, 92, 246, 0.1)" stroke-width="0.1"/>
+                </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#grid-purple)"/>
+            
+            <!-- Data Flow Lines -->
+            <path d="M 0 50 Q 25 30 50 50 T 100 50" stroke="rgba(139, 92, 246, 0.3)" stroke-width="0.2" fill="none" class="animate-pulse"/>
+            <path d="M 0 30 Q 25 50 50 30 T 100 30" stroke="rgba(236, 72, 153, 0.3)" stroke-width="0.2" fill="none" class="animate-pulse" style="animation-delay: 1s"/>
+            <path d="M 0 70 Q 25 90 50 70 T 100 70" stroke="rgba(6, 182, 212, 0.3)" stroke-width="0.2" fill="none" class="animate-pulse" style="animation-delay: 2s"/>
+        </svg>
+    </div>
+
+    <!-- Floating Code Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <!-- JavaScript Code -->
+        <div class="absolute top-32 left-16 text-xs text-purple-400/60 font-mono animate-float-slow">
+            <div class="mb-2">function registerUser() {</div>
+            <div class="ml-4 mb-2">if (form.valid) {</div>
+            <div class="ml-8 mb-2">createAccount();</div>
+            <div class="ml-4">}</div>
+            <div>}</div>
         </div>
+        
+        <!-- Python Code -->
+        <div class="absolute top-48 right-32 text-xs text-pink-400/60 font-mono animate-float-medium">
+            <div class="mb-2">def create_user(request):</div>
+            <div class="ml-4 mb-2">user = User.objects.create(</div>
+            <div class="ml-8 mb-2">username=username,</div>
+            <div class="ml-8 mb-2">email=email</div>
+            <div class="ml-4">)</div>
+        </div>
+        
+        <!-- HTML Code -->
+        <div class="absolute bottom-40 left-20 text-xs text-cyan-400/60 font-mono animate-float-fast">
+            <div class="mb-2">&lt;form class="register"&gt;</div>
+            <div class="ml-4 mb-2">&lt;input type="email" /&gt;</div>
+            <div class="ml-4 mb-2">&lt;button&gt;Register&lt;/button&gt;</div>
+            <div>&lt;/form&gt;</div>
+        </div>
+        
+        <!-- Terminal Commands -->
+        <div class="absolute bottom-32 right-16 text-xs text-green-400/60 font-mono animate-float-slow">
+            <div class="mb-2">$ python manage.py createsuperuser</div>
+            <div class="mb-2">$ npm run build</div>
+            <div class="mb-2">$ git push origin main</div>
+            <div>$ docker build -t app .</div>
+        </div>
+    </div>
 
-        <!-- Register Form -->
-        <div class="bg-white rounded-xl shadow-lg p-8">
-            <form method="post" class="space-y-6" id="registerForm">
-                {% csrf_token %}
-                
-                <!-- TC Kimlik Numarası -->
-                <div>
-                    <label for="{{ form.tc_kimlik.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.tc_kimlik.label }}
-                    </label>
-                    {{ form.tc_kimlik }}
-                    {% if form.tc_kimlik.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.tc_kimlik.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    {% if form.tc_kimlik.help_text %}
-                        <p class="mt-1 text-sm text-gray-500">{{ form.tc_kimlik.help_text }}</p>
-                    {% endif %}
+    <!-- Main Register Container -->
+    <div class="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
+        <div class="w-full max-w-lg">
+            <!-- Register Card -->
+            <div class="cyber-register-card backdrop-blur-xl bg-slate-900/80 border border-purple-500/30 rounded-2xl p-8 shadow-2xl">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                        <i class="fas fa-user-plus text-white text-3xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-2">Hesap Oluştur</h1>
+                    <p class="text-purple-300 text-sm">Cihaz Takip Sistemine katılın</p>
                 </div>
 
-                <!-- Kullanıcı Adı -->
-                <div>
-                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.username.label }}
-                    </label>
-                    {{ form.username }}
-                    {% if form.username.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.username.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                <!-- Register Form -->
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- First Name & Last Name -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="cyber-input-group">
+                            <label class="block text-sm font-medium text-purple-300 mb-2">
+                                <i class="fas fa-user mr-2"></i>Ad
+                            </label>
+                            <input type="text" name="first_name" required
+                                   class="cyber-input w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300"
+                                   placeholder="Adınız">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-purple-400"></i>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
-
-                <!-- Ad -->
-                <div>
-                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.first_name.label }}
-                    </label>
-                    {{ form.first_name }}
-                    {% if form.first_name.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.first_name.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                        
+                        <div class="cyber-input-group">
+                            <label class="block text-sm font-medium text-purple-300 mb-2">
+                                <i class="fas fa-user mr-2"></i>Soyad
+                            </label>
+                            <input type="text" name="last_name" required
+                                   class="cyber-input w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300"
+                                   placeholder="Soyadınız">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-purple-400"></i>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <!-- Soyad -->
-                <div>
-                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.last_name.label }}
-                    </label>
-                    {{ form.last_name }}
-                    {% if form.last_name.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.last_name.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                    <!-- Username -->
+                    <div class="cyber-input-group">
+                        <label class="block text-sm font-medium text-purple-300 mb-2">
+                            <i class="fas fa-at mr-2"></i>Kullanıcı Adı
+                        </label>
+                        <div class="relative">
+                            <input type="text" name="username" required
+                                   class="cyber-input w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300"
+                                   placeholder="Benzersiz kullanıcı adı">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-at text-purple-400"></i>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <!-- E-posta -->
-                <div>
-                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.email.label }}
-                    </label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.email.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                    <!-- Email -->
+                    <div class="cyber-input-group">
+                        <label class="block text-sm font-medium text-purple-300 mb-2">
+                            <i class="fas fa-envelope mr-2"></i>E-posta
+                        </label>
+                        <div class="relative">
+                            <input type="email" name="email" required
+                                   class="cyber-input w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300"
+                                   placeholder="E-posta adresiniz">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-purple-400"></i>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <!-- Telefon -->
-                <div>
-                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.phone.label }}
-                    </label>
-                    {{ form.phone }}
-                    {% if form.phone.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.phone.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                    <!-- TC Kimlik -->
+                    <div class="cyber-input-group">
+                        <label class="block text-sm font-medium text-purple-300 mb-2">
+                            <i class="fas fa-id-card mr-2"></i>TC Kimlik Numarası
+                        </label>
+                        <div class="relative">
+                            <input type="text" name="tc_kimlik" required maxlength="11" pattern="[0-9]{11}"
+                                   class="cyber-input w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300"
+                                   placeholder="11 haneli TC kimlik numarası">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-id-card text-purple-400"></i>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <!-- Şifre -->
-                <div>
-                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.password1.label }}
-                    </label>
-                    {{ form.password1 }}
-                    {% if form.password1.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.password1.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                    <!-- Password Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="cyber-input-group">
+                            <label class="block text-sm font-medium text-purple-300 mb-2">
+                                <i class="fas fa-lock mr-2"></i>Şifre
+                            </label>
+                            <div class="relative">
+                                <input type="password" name="password1" required
+                                       class="cyber-input w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300"
+                                       placeholder="Güçlü şifre">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-purple-400"></i>
+                                </div>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
-
-                <!-- Şifre Tekrarı -->
-                <div>
-                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        {{ form.password2.label }}
-                    </label>
-                    {{ form.password2 }}
-                    {% if form.password2.errors %}
-                        <div class="mt-1 text-sm text-red-600">
-                            {% for error in form.password2.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                        
+                        <div class="cyber-input-group">
+                            <label class="block text-sm font-medium text-purple-300 mb-2">
+                                <i class="fas fa-lock mr-2"></i>Şifre Tekrar
+                            </label>
+                            <div class="relative">
+                                <input type="password" name="password2" required
+                                       class="cyber-input w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300"
+                                       placeholder="Şifrenizi tekrar girin">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-purple-400"></i>
+                                </div>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <!-- Kayıt Butonu -->
-                <div>
-                    <button type="submit" class="w-full btn-success py-3 text-base font-medium">
+                    <!-- Terms & Conditions -->
+                    <div class="flex items-start">
+                        <input type="checkbox" name="terms" required class="cyber-checkbox-purple mr-3 mt-1">
+                        <label class="text-sm text-slate-300">
+                            <a href="#" class="text-purple-400 hover:text-purple-300">Kullanım şartları</a>nı ve 
+                            <a href="#" class="text-purple-400 hover:text-purple-300">gizlilik politikası</a>nı kabul ediyorum
+                        </label>
+                    </div>
+
+                    <!-- Register Button -->
+                    <button type="submit" class="cyber-register-btn w-full py-3 px-6 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-pink-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-purple-500/25">
                         <i class="fas fa-user-plus mr-2"></i>
                         Hesap Oluştur
                     </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="my-6 flex items-center">
+                    <div class="flex-1 border-t border-slate-600"></div>
+                    <span class="px-4 text-sm text-slate-400">veya</span>
+                    <div class="flex-1 border-t border-slate-600"></div>
                 </div>
-            </form>
 
-            <!-- Giriş Yap Linki -->
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600">
-                    Zaten hesabınız var mı?
-                    <a href="{% url 'users:login' %}" class="font-medium text-green-600 hover:text-green-500 transition-colors duration-200">
-                        Giriş yapın
-                    </a>
-                </p>
-            </div>
-
-            <!-- Bilgilendirme -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
+                <!-- Login Link -->
                 <div class="text-center">
-                    <p class="text-xs text-gray-500">
-                        <i class="fas fa-shield-alt mr-1"></i>
-                        Bilgileriniz güvenle saklanır ve üçüncü taraflarla paylaşılmaz
+                    <p class="text-slate-300 text-sm">
+                        Zaten hesabınız var mı?
+                        <a href="{% url 'users:login' %}" class="text-purple-400 hover:text-purple-300 font-medium transition-colors">
+                            Giriş yapın
+                        </a>
                     </p>
                 </div>
+
+                <!-- Error Messages -->
+                {% if form.errors %}
+                <div class="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-red-300">Kayıt Hatası</h3>
+                            <div class="text-sm text-red-200 mt-1">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-8">
+                <p class="text-slate-400 text-xs">
+                    © 2024 Cihaz Takip Sistemi. Tüm hakları saklıdır.
+                </p>
             </div>
         </div>
+    </div>
 
-        <!-- Footer -->
-        <div class="text-center">
-            <p class="text-xs text-gray-500">
-                &copy; 2024 Cihaz Takip Sistemi. Tüm hakları saklıdır.
-            </p>
-        </div>
+    <!-- Digital Cursor -->
+    <div class="absolute top-1/2 right-1/4 w-4 h-6 bg-purple-400 rounded-sm animate-blink pointer-events-none">
+        <div class="w-0.5 h-full bg-purple-400 animate-pulse"></div>
     </div>
 </div>
 
-<!-- Background Pattern -->
-<div class="fixed inset-0 -z-10 overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-emerald-50"></div>
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
-</div>
+<!-- Custom CSS for Cyberpunk Effects -->
+<style>
+    /* Matrix Rain Effect - Purple Theme */
+    .matrix-rain-purple {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, 
+            transparent 0%, 
+            rgba(139, 92, 246, 0.1) 50%, 
+            transparent 100%);
+        animation: matrix-rain-purple 20s linear infinite;
+    }
 
-<!-- Form Validation JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registerForm');
-    const tcKimlikInput = document.getElementById('{{ form.tc_kimlik.id_for_label }}');
-    const emailInput = document.getElementById('{{ form.email.id_for_label }}');
-    const usernameInput = document.getElementById('{{ form.username.id_for_label }}');
-    
-    // TC Kimlik numarası kontrolü
-    tcKimlikInput.addEventListener('blur', function() {
-        const tcKimlik = this.value;
-        if (tcKimlik.length === 11 && /^\d+$/.test(tcKimlik)) {
-            fetch('{% url "users:check_tc_kimlik" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: 'tc_kimlik=' + encodeURIComponent(tcKimlik)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    this.classList.add('border-red-500');
-                    this.classList.remove('border-gray-300');
-                    // Hata mesajı göster
-                    let errorDiv = this.parentNode.querySelector('.tc-error');
-                    if (!errorDiv) {
-                        errorDiv = document.createElement('div');
-                        errorDiv.className = 'mt-1 text-sm text-red-600 tc-error';
-                        this.parentNode.appendChild(errorDiv);
-                    }
-                    errorDiv.textContent = 'Bu TC Kimlik Numarası zaten kayıtlı.';
-                } else {
-                    this.classList.remove('border-red-500');
-                    this.classList.add('border-gray-300');
-                    const errorDiv = this.parentNode.querySelector('.tc-error');
-                    if (errorDiv) errorDiv.remove();
-                }
-            });
+    @keyframes matrix-rain-purple {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100%); }
+    }
+
+    /* Floating Animations */
+    .animate-float-slow {
+        animation: float-slow 6s ease-in-out infinite;
+    }
+
+    .animate-float-medium {
+        animation: float-medium 4s ease-in-out infinite;
+    }
+
+    .animate-float-fast {
+        animation: float-fast 3s ease-in-out infinite;
+    }
+
+    @keyframes float-slow {
+        0%, 100% { transform: translateY(0px) rotate(12deg); }
+        50% { transform: translateY(-20px) rotate(15deg); }
+    }
+
+    @keyframes float-medium {
+        0%, 100% { transform: translateY(0px) rotate(-12deg); }
+        50% { transform: translateY(-15px) rotate(-8deg); }
+    }
+
+    @keyframes float-fast {
+        0%, 100% { transform: translateY(0px) rotate(45deg); }
+        50% { transform: translateY(-10px) rotate(50deg); }
+    }
+
+    /* Cyber Register Card */
+    .cyber-register-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cyber-register-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(139, 92, 246, 0.1), 
+            transparent);
+        animation: cyber-scan-purple 3s ease-in-out infinite;
+    }
+
+    @keyframes cyber-scan-purple {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    /* Cyber Input Styling */
+    .cyber-input {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .cyber-input:focus {
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+
+    /* Cyber Checkbox - Purple Theme */
+    .cyber-checkbox-purple {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #8b5cf6;
+        border-radius: 4px;
+        background: rgba(139, 92, 246, 0.1);
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .cyber-checkbox-purple:checked {
+        background: #8b5cf6;
+        border-color: #8b5cf6;
+    }
+
+    .cyber-checkbox-purple:checked::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    /* Cyber Register Button */
+    .cyber-register-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cyber-register-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.2), 
+            transparent);
+        transition: left 0.5s ease;
+    }
+
+    .cyber-register-btn:hover::before {
+        left: 100%;
+    }
+
+    /* Blinking Cursor */
+    .animate-blink {
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 640px) {
+        .cyber-register-card {
+            margin: 1rem;
+            padding: 1.5rem;
         }
-    });
-    
-    // E-posta kontrolü
-    emailInput.addEventListener('blur', function() {
-        const email = this.value;
-        if (email && email.includes('@')) {
-            fetch('{% url "users:check_email" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: 'email=' + encodeURIComponent(email)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    this.classList.add('border-red-500');
-                    this.classList.remove('border-gray-300');
-                    let errorDiv = this.parentNode.querySelector('.email-error');
-                    if (!errorDiv) {
-                        errorDiv = document.createElement('div');
-                        errorDiv.className = 'mt-1 text-sm text-red-600 email-error';
-                        this.parentNode.appendChild(errorDiv);
-                    }
-                    errorDiv.textContent = 'Bu e-posta adresi zaten kayıtlı.';
-                } else {
-                    this.classList.remove('border-red-500');
-                    this.classList.add('border-gray-300');
-                    const errorDiv = this.parentNode.querySelector('.email-error');
-                    if (errorDiv) errorDiv.remove();
-                }
-            });
+        
+        .floating-code-elements {
+            display: none;
         }
-    });
-    
-    // Kullanıcı adı kontrolü
-    usernameInput.addEventListener('blur', function() {
-        const username = this.value;
-        if (username.length >= 3) {
-            fetch('{% url "users:check_username" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: 'username=' + encodeURIComponent(username)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    this.classList.add('border-red-500');
-                    this.classList.remove('border-gray-300');
-                    let errorDiv = this.parentNode.querySelector('.username-error');
-                    if (!errorDiv) {
-                        errorDiv = document.createElement('div');
-                        errorDiv.className = 'mt-1 text-sm text-red-600 username-error';
-                        this.parentNode.appendChild(errorDiv);
-                    }
-                    errorDiv.textContent = 'Bu kullanıcı adı zaten kullanılıyor.';
-                } else {
-                    this.classList.remove('border-red-500');
-                    this.classList.add('border-gray-300');
-                    const errorDiv = this.parentNode.querySelector('.username-error');
-                    if (errorDiv) errorDiv.remove();
-                }
-            });
-        }
-    });
-});
-</script>
+    }
+</style>
 {% endblock %}

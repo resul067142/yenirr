@@ -2,194 +2,1101 @@
 
 {% block title %}Kullanıcı Yönetimi - Cihaz Takip Sistemi{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Modern Kullanıcı Yönetimi Tasarımı */
+.user-management-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 16px;
+    background: linear-gradient(135deg, #fafbfc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+}
+
+/* Compact Header */
+.compact-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Buton Stilleri */
+.btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #10b981, #059669, #3b82f6, #8b5cf6);
+    background-size: 400% 400%;
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    animation: gradientShift 3s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    animation-duration: 1.5s;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #f1f5f9, #e2e8f0, #cbd5e1, #94a3b8);
+    background-size: 400% 400%;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    animation: gradientShiftSecondary 4s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-secondary:hover {
+    color: #334155;
+    transform: translateY(-2px);
+    animation-duration: 2s;
+}
+
+@keyframes gradientShiftSecondary {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* Search ve Filter Section */
+.search-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.search-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-section h3 i {
+    color: #3b82f6;
+}
+
+.search-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-input, .form-select {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #f9fafb;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+}
+
+/* Kullanıcı Listesi */
+.users-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.users-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.users-section h3 i {
+    color: #3b82f6;
+}
+
+/* Tablo Stilleri */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.users-table th {
+    background: #f8fafc;
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.users-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.users-table tr:hover {
+    background: #f8fafc;
+}
+
+.users-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Kullanıcı Bilgileri */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-avatar i {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 20px;
+    background: #f1f5f9;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.user-username {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.user-phone {
+    color: #64748b;
+    font-size: 11px;
+}
+
+/* Badge Stilleri */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-role {
+    padding: 4px 8px;
+    font-size: 10px;
+}
+
+.badge-superadmin {
+    background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+    color: #7c3aed;
+    border: 1px solid #e9d5ff;
+}
+
+.badge-admin {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.badge-user {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.badge-active {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.badge-inactive {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.badge-locked {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    color: #d97706;
+    border: 1px solid #fed7aa;
+}
+
+/* İşlem Butonları */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+.action-btn-edit {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.action-btn-edit:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+}
+
+.action-btn-delete {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.action-btn-delete:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-1px);
+}
+
+.action-btn-permissions {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.action-btn-permissions:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.pagination-btn {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+}
+
+.pagination-btn:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.pagination-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.pagination-btn:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Hover Panels */
+.hover-panels-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.hover-panel {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.panel-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #10b981, #f59e0b);
+    background-size: 400% 400%;
+    animation: gradientShiftButton 5s ease infinite;
+    font-weight: 600;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.panel-trigger:hover {
+    animation-duration: 2s;
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+}
+
+.panel-trigger i:first-child {
+    font-size: 18px;
+}
+
+.panel-trigger i:last-child {
+    margin-left: auto;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.panel-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    background: #fafbfc;
+    border-top: 1px solid #e2e8f0;
+    padding: 0;
+}
+
+.hover-panel:hover .panel-content {
+    max-height: 500px;
+    opacity: 1;
+    padding: 20px;
+}
+
+.hover-panel:hover .panel-trigger i:last-child {
+    transform: rotate(180deg);
+}
+
+@keyframes gradientShiftButton {
+    0% {
+        background-position: 0% 50%;
+    }
+    25% {
+        background-position: 100% 50%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    75% {
+        background-position: 0% 100%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Compact Stats */
+.compact-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.compact-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fefefe;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.compact-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    flex-shrink: 0;
+}
+
+.compact-stat-icon.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.compact-stat-icon.admin {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.compact-stat-icon.superadmin {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.compact-stat-icon.new {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.compact-stat-icon.locked {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.compact-stat-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.compact-stat-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.compact-stat-label {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Compact Forms */
+.compact-search-form {
+    background: #fefefe;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.compact-form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.compact-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.compact-form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.compact-form-input, .compact-form-select {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: all 0.2s;
+    background: #f9fafb;
+}
+
+.compact-form-input:focus, .compact-form-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.compact-search-btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.compact-search-btn:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .hover-panels-section {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .compact-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .compact-form-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .compact-form-group:last-child {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-management-container {
+        padding: 12px;
+    }
+    
+    .compact-header {
+        margin-bottom: 12px;
+    }
+    
+    .compact-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .compact-stat {
+        padding: 10px;
+    }
+    
+    .compact-stat-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .compact-stat-number {
+        font-size: 18px;
+    }
+    
+    .compact-form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .compact-form-group:last-child {
+        grid-column: span 1;
+    }
+    
+    .users-table {
+        font-size: 12px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 12px 16px;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-content h1 {
+        font-size: 24px;
+    }
+    
+    .header-content h1 i {
+        font-size: 28px;
+    }
+    
+    .users-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto">
-    <div class="space-y-6">
-        <!-- Page Header -->
-        <div class="cyber-card">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-white mb-2">
-                        <i class="fas fa-users mr-3 text-cyan-400"></i>
-                        Kullanıcı Yönetimi
-                    </h1>
-                    <p class="text-cyan-400 text-lg">Sistem kullanıcılarını yönetin</p>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'users:add_user' %}" class="btn-cyber-primary">
-                        <i class="fas fa-user-plus mr-2"></i>
-                        Yeni Kullanıcı
-                    </a>
+<div class="user-management-container">
+    <!-- Compact Header -->
+    <div class="compact-header">
+        <div class="header-actions">
+            <a href="{% url 'users:add_user' %}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Yeni Kullanıcı
+            </a>
+            <a href="{% url 'users:user_permissions' %}" class="btn btn-secondary">
+                <i class="fas fa-shield-alt"></i>
+                Yetkiler
+            </a>
+            <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">
+                <i class="fas fa-home"></i>
+                Ana Sayfa
+            </a>
+        </div>
+    </div>
+
+    <!-- Hover Panels Section -->
+    <div class="hover-panels-section">
+        <!-- Statistics Hover Panel -->
+        <div class="hover-panel stats-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-chart-bar"></i>
+                <span>Kullanıcı İstatistikleri</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <div class="compact-stats-grid">
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ total_users }}</div>
+                            <div class="compact-stat-label">Toplam</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon active">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ active_users }}</div>
+                            <div class="compact-stat-label">Aktif</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon admin">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ admin_users }}</div>
+                            <div class="compact-stat-label">Admin</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon superadmin">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ superadmin_users }}</div>
+                            <div class="compact-stat-label">Süper Admin</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon new">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ new_users_this_month }}</div>
+                            <div class="compact-stat-label">Bu Ay Yeni</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon locked">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="compact-stat-info">
+                            <div class="compact-stat-number">{{ locked_users }}</div>
+                            <div class="compact-stat-label">Kilitli</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filters -->
-        <div class="cyber-card">
-            <h2 class="text-xl font-bold text-cyan-400 mb-4">
-                <i class="fas fa-filter mr-2"></i>
-                Filtreler
-            </h2>
-            <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-cyan-400 mb-2">Rol</label>
-                    <select name="role" class="cyber-select">
-                        <option value="">Tümü</option>
-                        {% for value, label in role_choices %}
-                            <option value="{{ value }}" {% if current_filters.role == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-cyan-400 mb-2">Durum</label>
-                    <select name="status" class="cyber-select">
-                        <option value="">Tümü</option>
-                        <option value="active" {% if current_filters.status == 'active' %}selected{% endif %}>Aktif</option>
-                        <option value="inactive" {% if current_filters.status == 'inactive' %}selected{% endif %}>Pasif</option>
-                        <option value="locked" {% if current_filters.status == 'locked' %}selected{% endif %}>Kilitli</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-cyan-400 mb-2">Arama</label>
-                    <input type="text" name="search" value="{{ current_filters.search|default:'' }}" placeholder="Kullanıcı adı, ad, soyad..." class="cyber-input">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="btn-cyber-secondary w-full">
-                        <i class="fas fa-search mr-2"></i>
-                        Filtrele
-                    </button>
-                </div>
-            </form>
+        <!-- Filters Hover Panel -->
+        <div class="hover-panel filters-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-filter"></i>
+                <span>Arama ve Filtreler</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <form method="get" class="compact-search-form">
+                    <div class="compact-form-row">
+                        <div class="compact-form-group">
+                            <label class="compact-form-label">Arama</label>
+                            <input type="text" name="search" value="{{ request.GET.search }}" 
+                                   class="compact-form-input" placeholder="Ad, soyad, kullanıcı adı...">
+                        </div>
+                        
+                        <div class="compact-form-group">
+                            <label class="compact-form-label">Rol</label>
+                            <select name="role" class="compact-form-select">
+                                <option value="">Tümü</option>
+                                <option value="superadmin" {% if request.GET.role == 'superadmin' %}selected{% endif %}>Süper Admin</option>
+                                <option value="admin" {% if request.GET.role == 'admin' %}selected{% endif %}>Admin</option>
+                                <option value="user" {% if request.GET.role == 'user' %}selected{% endif %}>Standart Kullanıcı</option>
+                            </select>
+                        </div>
+                        
+                        <div class="compact-form-group">
+                            <label class="compact-form-label">Durum</label>
+                            <select name="status" class="compact-form-select">
+                                <option value="">Tümü</option>
+                                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Aktif</option>
+                                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Pasif</option>
+                                <option value="locked" {% if request.GET.status == 'locked' %}selected{% endif %}>Kilitli</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="compact-search-btn">
+                            <i class="fas fa-search"></i>
+                            Ara
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
 
-        <!-- Users Table -->
-        <div class="cyber-card">
-            <div class="overflow-x-auto">
-                <table class="cyber-table w-full">
-                    <thead>
-                        <tr>
-                            <th>Kullanıcı</th>
-                            <th>TC Kimlik</th>
-                            <th>E-posta</th>
-                            <th>Rol</th>
-                            <th>Durum</th>
-                            <th>Kayıt Tarihi</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-600">
-                        {% for user in users %}
-                        <tr class="hover:bg-slate-700 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
-                                        {% if user.profile_image %}
-                                            <img src="{{ user.profile_image.url }}" alt="Profil" class="w-full h-full object-cover">
-                                        {% else %}
-                                            <div class="w-full h-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
-                                                <span class="text-white font-bold text-sm">{{ user.first_name|first }}{{ user.last_name|first }}</span>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div>
-                                        <div class="font-medium text-white">{{ user.get_full_name }}</div>
-                                        <div class="text-slate-400">@{{ user.username }}</div>
-                                    </div>
+    <!-- Kullanıcı Listesi -->
+    <div class="users-section">
+        <h3>
+            <i class="fas fa-list"></i>
+            Kullanıcı Listesi
+        </h3>
+        
+        {% if page_obj %}
+        <div class="table-responsive">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı</th>
+                        <th>Rol</th>
+                        <th>Durum</th>
+                        <th>E-posta</th>
+                        <th>Telefon</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in page_obj %}
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    {% if user.profile_image %}
+                                        <img src="{{ user.profile_image.url }}" alt="Profil Resmi">
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
                                 </div>
-                            </td>
-                            <td class="px-6 py-4 text-slate-300">{{ user.tc_kimlik }}</td>
-                            <td class="px-6 py-4 text-slate-300">{{ user.email }}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                    {% if user.role == 'superadmin' %}bg-purple-900 text-purple-300
-                                    {% elif user.role == 'admin' %}bg-blue-900 text-blue-300
-                                    {% else %}bg-green-900 text-green-300{% endif %}">
-                                    {{ user.get_role_display }}
+                                <div class="user-details">
+                                    <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                                    <div class="user-username">@{{ user.username }}</div>
+                                    {% if user.phone %}
+                                        <div class="user-phone">{{ user.phone }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if user.role == 'superadmin' %}
+                                <span class="badge badge-role badge-superadmin">
+                                    <i class="fas fa-crown"></i>
+                                    Süper Admin
                                 </span>
-                            </td>
-                            <td class="px-6 py-4">
-                                {% if user.is_locked %}
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-900 text-red-300">
-                                        <i class="fas fa-lock mr-1"></i>Kilitli
-                                    </span>
-                                {% elif user.is_active %}
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-900 text-green-300">
-                                        <i class="fas fa-check mr-1"></i>Aktif
-                                    </span>
-                                {% else %}
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-slate-900 text-slate-300">
-                                        <i class="fas fa-times mr-1"></i>Pasif
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td class="px-6 py-4 text-slate-400">{{ user.date_joined|date:"d.m.Y H:i" }}</td>
-                            <td class="px-6 py-4">
-                                <div class="flex space-x-2">
-                                    <a href="{% url 'users:edit_user' user.id %}" class="text-cyan-400 hover:text-cyan-300" title="Düzenle">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    {% if user.is_locked %}
-                                        <a href="{% url 'users:unlock_user' user.id %}" class="text-green-400 hover:text-green-300" title="Hesabı Aç">
-                                            <i class="fas fa-unlock"></i>
-                                        </a>
-                                    {% endif %}
-                                    {% if user != request.user %}
-                                        <a href="{% url 'users:delete_user' user.id %}" class="text-red-400 hover:text-red-300" title="Sil">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-slate-400">
-                                <i class="fas fa-users text-4xl mb-4 block"></i>
-                                <p class="text-lg">Henüz kullanıcı bulunmuyor</p>
-                                <a href="{% url 'users:add_user' %}" class="btn-cyber-primary mt-4 inline-block">
-                                    <i class="fas fa-user-plus mr-2"></i>
-                                    İlk Kullanıcıyı Ekle
+                            {% elif user.role == 'admin' %}
+                                <span class="badge badge-role badge-admin">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Admin
+                                </span>
+                            {% else %}
+                                <span class="badge badge-role badge-user">
+                                    <i class="fas fa-user"></i>
+                                    Standart
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.is_locked %}
+                                <span class="badge badge-locked">
+                                    <i class="fas fa-lock"></i>
+                                    Kilitli
+                                </span>
+                            {% elif user.is_active %}
+                                <span class="badge badge-active">
+                                    <i class="fas fa-check"></i>
+                                    Aktif
+                                </span>
+                            {% else %}
+                                <span class="badge badge-inactive">
+                                    <i class="fas fa-times"></i>
+                                    Pasif
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone|default:"-" }}</td>
+                        <td>{{ user.date_joined|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'users:edit_user' user.id %}" 
+                                   class="action-btn action-btn-edit" title="Düzenle">
+                                    <i class="fas fa-edit"></i>
                                 </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                                <a href="{% url 'users:user_permissions' %}?user_id={{ user.id }}" 
+                                   class="action-btn action-btn-permissions" title="Yetkileri Düzenle">
+                                    <i class="fas fa-shield-alt"></i>
+                                </a>
+                                {% if user.id != request.user.id %}
+                                <button onclick="deleteUser({{ user.id }}, '{{ user.get_full_name|default:user.username }}')" 
+                                        class="btn btn-danger btn-sm" title="Sil">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         <!-- Pagination -->
-        {% if users.has_other_pages %}
-        <div class="cyber-card">
-            <div class="flex justify-center">
-                <nav class="flex space-x-2">
-                    {% if users.has_previous %}
-                        <a href="?page={{ users.previous_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn-cyber-secondary">
-                            <i class="fas fa-chevron-left mr-2"></i>
-                            Önceki
-                        </a>
-                    {% endif %}
-                    
-                    {% for num in users.paginator.page_range %}
-                        {% if users.number == num %}
-                            <span class="px-4 py-2 bg-cyan-600 text-white rounded-lg border border-cyan-500">{{ num }}</span>
-                        {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
-                            <a href="?page={{ num }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn-cyber-secondary">
-                                {{ num }}
-                            </a>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if users.has_next %}
-                        <a href="?page={{ users.next_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn-cyber-secondary">
-                            Sonraki
-                            <i class="fas fa-chevron-right ml-2"></i>
-                        </a>
-                    {% endif %}
-                </nav>
-            </div>
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="pagination-btn">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="pagination-btn">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="pagination-btn active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                       class="pagination-btn">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="pagination-btn">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="pagination-btn">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-16 text-slate-500">
+            <i class="fas fa-users text-6xl mb-6 text-slate-300"></i>
+            <h4 class="text-xl font-semibold text-slate-600 mb-3">Henüz Kullanıcı Bulunmuyor</h4>
+            <p class="text-slate-500 mb-6">Sistemde henüz kayıtlı kullanıcı bulunmuyor.</p>
+            <a href="{% url 'users:add_user' %}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                İlk Kullanıcıyı Ekleyin
+            </a>
         </div>
         {% endif %}
     </div>
 </div>
+
+<script>
+// Kullanıcı silme fonksiyonu
+function deleteUser(userId, userName) {
+    if (confirm(`"${userName}" kullanıcısını silmek istediğinizden emin misiniz?`)) {
+        // CSRF token'ı al
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                         document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='))?.split('=')[1];
+        
+        fetch(`/users/delete/${userId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Kullanıcı başarıyla silindi!');
+                location.reload();
+            } else {
+                alert('Hata: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu!');
+        });
+    }
+}
+
+// Form submit loading
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.querySelector('.compact-search-form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function() {
+            const searchBtn = this.querySelector('.compact-search-btn');
+            if (searchBtn) {
+                searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aranıyor...';
+                searchBtn.disabled = true;
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

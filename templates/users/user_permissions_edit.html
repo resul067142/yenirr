@@ -1,0 +1,189 @@
+{% extends 'layout/base.html' %}
+{% block title %}Kullanıcı Yetkilerini Düzenle - Cihaz Takip Sistemi{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="space-y-6">
+        <!-- Page Header -->
+        <div class="cyber-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-cyan-400">
+                        <i class="fas fa-user-shield mr-3"></i>
+                        {{ target_user.get_full_name }} kullanıcısının yetkilerini düzenleyin
+                    </h1>
+                    <p class="text-slate-400 mt-2">
+                        Kullanıcı yetkilerini ve durumunu güncelleyin
+                    </p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'users:user_permissions' %}" class="btn-cyber-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Geri Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="cyber-card">
+            <h2 class="text-xl font-bold text-cyan-400 mb-4">
+                <i class="fas fa-user mr-2"></i>
+                Kullanıcı Bilgileri
+            </h2>
+            <div class="flex items-center space-x-6">
+                <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-cyan-500">
+                    {% if target_user.profile_image %}
+                        <img src="{{ target_user.profile_image.url }}" alt="Profil Resmi" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-2xl"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-slate-400">Kullanıcı Adı</p>
+                            <p class="text-lg font-semibold text-white">@{{ target_user.username }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-400">E-posta</p>
+                            <p class="text-lg font-semibold text-white">{{ target_user.email }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-400">TC Kimlik</p>
+                            <p class="text-lg font-semibold text-white">{{ target_user.tc_kimlik|default:"Belirtilmemiş" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-400">Telefon</p>
+                            <p class="text-lg font-semibold text-white">{{ target_user.phone|default:"Belirtilmemiş" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-400">Kayıt Tarihi</p>
+                            <p class="text-lg font-semibold text-white">{{ target_user.date_joined|date:"d.m.Y H:i" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-400">Son Giriş</p>
+                            <p class="text-lg font-semibold text-white">{{ target_user.last_login|date:"d.m.Y H:i"|default:"Hiç giriş yapmamış" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions Form -->
+        <div class="cyber-card">
+            <h2 class="text-xl font-bold text-cyan-400 mb-4">
+                <i class="fas fa-key mr-2"></i>
+                Yetki Ayarları
+            </h2>
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Role Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">
+                        <i class="fas fa-user-shield mr-2"></i>
+                        Kullanıcı Rolü
+                    </label>
+                    <select name="role" class="cyber-select w-full">
+                        {% for value, label in role_choices %}
+                            <option value="{{ value }}" {% if target_user.role == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="mt-2 text-sm text-slate-400">
+                        <p><strong>Süper Admin:</strong> Tüm yetkilere sahip, diğer admin'leri yönetebilir</p>
+                        <p><strong>Admin:</strong> Kullanıcı ve cihaz yönetimi yapabilir</p>
+                        <p><strong>Standart Kullanıcı:</strong> Sadece kendi cihazlarını yönetebilir</p>
+                    </div>
+                </div>
+
+                <!-- Status Settings -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" name="is_active" id="is_active" 
+                               {% if target_user.is_active %}checked{% endif %}
+                               class="cyber-checkbox">
+                        <label for="is_active" class="text-sm font-medium text-slate-300">
+                            Hesap Aktif
+                        </label>
+                        <p class="text-xs text-slate-400">Kullanıcı giriş yapabilir</p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" name="is_staff" id="is_staff" 
+                               {% if target_user.is_staff %}checked{% endif %}
+                               class="cyber-checkbox">
+                        <label for="is_staff" class="text-sm font-medium text-slate-300">
+                            Django Admin Erişimi
+                        </label>
+                        <p class="text-xs text-slate-400">Django admin paneline erişim</p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" name="is_superuser" id="is_superuser" 
+                               {% if target_user.is_superuser %}checked{% endif %}
+                               class="cyber-checkbox">
+                        <label for="is_superuser" class="text-sm font-medium text-slate-300">
+                            Django Süper Kullanıcı
+                        </label>
+                        <p class="text-xs text-slate-400">Django'nun tüm yetkileri</p>
+                    </div>
+                </div>
+
+                <!-- Current Status Display -->
+                <div class="bg-slate-800 border border-slate-600 rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-slate-300 mb-3">Mevcut Durum</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-900 text-green-300">
+                            <i class="fas fa-user-shield mr-2"></i>
+                            Rol: {{ target_user.get_role_display }}
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                            {% if target_user.is_active %}bg-green-900 text-green-300{% else %}bg-red-900 text-red-300{% endif %}">
+                            <i class="fas fa-{% if target_user.is_active %}check{% else %}times{% endif %} mr-2"></i>
+                            Durum: {% if target_user.is_active %}Aktif{% else %}Pasif{% endif %}
+                        </span>
+                        {% if target_user.is_locked %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-900 text-red-300">
+                            <i class="fas fa-lock mr-2"></i>
+                            Hesap Kilitli
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Warning if editing self -->
+                {% if target_user == request.user %}
+                <div class="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-yellow-400 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-yellow-300">Dikkat!</h3>
+                            <p class="text-sm text-yellow-200 mt-1">
+                                Kendi yetkilerinizi düzenliyorsunuz. Dikkatli olun!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-slate-600">
+                    <a href="{% url 'users:user_permissions' %}" class="btn-cyber-secondary">
+                        <i class="fas fa-times mr-2"></i>
+                        İptal
+                    </a>
+                    <button type="submit" class="btn-cyber-primary">
+                        <i class="fas fa-save mr-2"></i>
+                        Yetkileri Güncelle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

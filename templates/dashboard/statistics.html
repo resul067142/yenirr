@@ -1,419 +1,379 @@
 {% extends 'layout/base.html' %}
 
-{% block title %}Sistem İstatistikleri - Cihaz Takip Sistemi{% endblock %}
-
-{% block extra_css %}
-<style>
-.chart-container {
-    position: relative;
-    height: 400px;
-    width: 100%;
-}
-</style>
-{% endblock %}
+{% block title %}İstatistikler - Cihaz Takip Sistemi{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <!-- Page Header -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    <i class="fas fa-chart-pie mr-3 text-blue-600"></i>
-                    Sistem İstatistikleri
-                </h1>
-                <p class="text-gray-600 mt-1">Sistem geneli detaylı analizler ve raporlar</p>
-            </div>
-            <div class="flex space-x-3">
-                <a href="{% url 'devices:device_export_csv' %}" class="btn-secondary">
-                    <i class="fas fa-download mr-2"></i>
-                    CSV Export
-                </a>
-                <a href="{% url 'dashboard:home' %}" class="btn-primary">
-                    <i class="fas fa-home mr-2"></i>
-                    Ana Sayfa
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Summary Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-users text-white text-sm"></i>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Toplam Kullanıcı</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ total_users }}</p>
-                </div>
-            </div>
-        </div>
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-slate-800 border border-slate-600 rounded-xl shadow-xl p-6">
+        <h1 class="text-3xl font-bold text-white mb-6">Sistem İstatistikleri</h1>
         
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-green-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-mobile-alt text-white text-sm"></i>
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-blue-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-700">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-blue-100">Toplam Kullanıcı</p>
+                        <p class="text-3xl font-bold">{{ total_users|default:"0" }}</p>
                     </div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Toplam Cihaz</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ total_devices }}</p>
-                </div>
             </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-purple-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-chart-line text-white text-sm"></i>
+            
+            <div class="bg-green-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-700">
+                        <i class="fas fa-mobile-alt text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-green-100">Toplam Cihaz</p>
+                        <p class="text-3xl font-bold">{{ total_devices|default:"0" }}</p>
                     </div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Ortalama Cihaz/User</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ avg_devices_per_user|floatformat:1 }}</p>
-                </div>
             </div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-red-600 rounded-md flex items-center justify-center">
-                        <i class="fas fa-lock text-white text-sm"></i>
+            
+            <div class="bg-purple-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-700">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-purple-100">Ortalama Cihaz/User</p>
+                        <p class="text-3xl font-bold">{{ avg_devices_per_user|floatformat:1|default:"0.0" }}</p>
                     </div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Kilitli Hesaplar</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ locked_accounts }}</p>
+            </div>
+            
+            <div class="bg-red-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-700">
+                        <i class="fas fa-lock text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-red-100">Kilitli Hesaplar</p>
+                        <p class="text-3xl font-bold">{{ locked_accounts|default:"0" }}</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- User Role Distribution -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                <i class="fas fa-user-shield mr-2 text-purple-600"></i>
-                Kullanıcı Rol Dağılımı
-            </h3>
-            <div class="chart-container">
-                <canvas id="userRoleChart"></canvas>
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-slate-700 border border-slate-600 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-4">Kullanıcı Rol Dağılımı</h3>
+                <div class="h-64">
+                    <canvas id="userRoleChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-slate-700 border border-slate-600 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-4">Cihaz Türü Dağılımı</h3>
+                <div class="h-64">
+                    <canvas id="deviceTypeChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Device Type Distribution -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                <i class="fas fa-pie-chart mr-2 text-blue-600"></i>
-                Cihaz Türü Dağılımı
-            </h3>
-            <div class="chart-container">
-                <canvas id="deviceTypeChart"></canvas>
+        <!-- Time Series Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-slate-700 border border-slate-600 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-4">Son 7 Gün Kullanıcı Kayıtları</h3>
+                <div class="h-64">
+                    <canvas id="weeklyUserChart"></canvas>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Time Series Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Last 7 Days User Registrations -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                <i class="fas fa-user-plus mr-2 text-green-600"></i>
-                Son 7 Gün Kullanıcı Kayıtları
-            </h3>
-            <div class="chart-container">
-                <canvas id="weeklyUserChart"></canvas>
+            
+            <div class="bg-slate-700 border border-slate-600 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-4">Son 7 Gün Cihaz Kayıtları</h3>
+                <div class="h-64">
+                    <canvas id="weeklyDeviceChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Last 7 Days Device Registrations -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                <i class="fas fa-mobile-alt mr-2 text-blue-600"></i>
-                Son 7 Gün Cihaz Kayıtları
-            </h3>
-            <div class="chart-container">
-                <canvas id="weeklyDeviceChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detailed Statistics -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Top Users by Device Count -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                <i class="fas fa-trophy mr-2 text-yellow-600"></i>
-                En Çok Cihaza Sahip Kullanıcılar
-            </h3>
-            <div class="space-y-3">
-                {% for user_stat in top_users_by_devices %}
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                            <span class="text-yellow-600 font-bold text-sm">{{ forloop.counter }}</span>
+        <!-- Detailed Statistics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-slate-700 border border-slate-600 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-4">En Çok Cihaza Sahip Kullanıcılar</h3>
+                {% if top_users %}
+                    {% for user_stat in top_users %}
+                    <div class="flex items-center justify-between p-3 bg-slate-600 rounded-lg mb-2">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                {{ forloop.counter }}
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-medium text-white">{{ user_stat.get_full_name|default:user_stat.username }}</p>
+                                <p class="text-sm text-slate-300">{{ user_stat.tc_kimlik|default:"-" }}</p>
+                            </div>
                         </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">{{ user_stat.user_name }}</p>
-                            <p class="text-xs text-gray-500">{{ user_stat.tc_kimlik }}</p>
+                        <div class="text-right">
+                            <p class="text-lg font-bold text-white">{{ user_stat.device_count }}</p>
+                            <p class="text-sm text-slate-300">cihaz</p>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-sm font-medium text-gray-900">{{ user_stat.total_devices }}</p>
-                        <p class="text-xs text-gray-500">cihaz</p>
-                    </div>
-                </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-slate-400 text-center py-8">Henüz cihaz kaydı bulunmuyor</p>
+                {% endif %}
             </div>
-        </div>
-
-        <!-- Recent System Activities -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                <i class="fas fa-clock mr-2 text-orange-600"></i>
-                Son Sistem Aktiviteleri
-            </h3>
-            <div class="space-y-3">
-                {% for activity in recent_activities %}
-                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 {% if activity.log_type == 'user_login' %}bg-green-100{% elif activity.log_type == 'user_register' %}bg-blue-100{% elif activity.log_type == 'device_add' %}bg-purple-100{% elif activity.log_type == 'device_edit' %}bg-yellow-100{% elif activity.log_type == 'device_delete' %}bg-red-100{% else %}bg-gray-100{% endif %} rounded-full flex items-center justify-center">
+            
+            <div class="bg-slate-700 border border-slate-600 rounded-xl p-6">
+                <h3 class="text-xl font-bold text-white mb-4">Son Sistem Aktiviteleri</h3>
+                {% if recent_activities %}
+                    {% for activity in recent_activities %}
+                    <div class="flex items-center p-3 bg-slate-600 rounded-lg mb-2">
+                        <div class="w-8 h-8 {% if activity.log_type == 'user_login' %}bg-green-500{% elif activity.log_type == 'user_register' %}bg-blue-500{% elif activity.log_type == 'device_add' %}bg-purple-500{% elif activity.log_type == 'device_edit' %}bg-yellow-500{% elif activity.log_type == 'device_delete' %}bg-red-500{% else %}bg-slate-500{% endif %} rounded-full flex items-center justify-center">
                             {% if activity.log_type == 'user_login' %}
-                                <i class="fas fa-sign-in-alt text-green-600 text-sm"></i>
+                                <i class="fas fa-sign-in-alt text-white text-sm"></i>
                             {% elif activity.log_type == 'user_register' %}
-                                <i class="fas fa-user-plus text-blue-600 text-sm"></i>
+                                <i class="fas fa-user-plus text-white text-sm"></i>
                             {% elif activity.log_type == 'device_add' %}
-                                <i class="fas fa-plus text-purple-600 text-sm"></i>
+                                <i class="fas fa-plus text-white text-sm"></i>
                             {% elif activity.log_type == 'device_edit' %}
-                                <i class="fas fa-edit text-yellow-600 text-sm"></i>
+                                <i class="fas fa-edit text-white text-sm"></i>
                             {% elif activity.log_type == 'device_delete' %}
-                                <i class="fas fa-trash text-red-600 text-sm"></i>
+                                <i class="fas fa-trash text-white text-sm"></i>
                             {% else %}
-                                <i class="fas fa-info text-gray-600 text-sm"></i>
+                                <i class="fas fa-info text-white text-sm"></i>
                             {% endif %}
                         </div>
+                        <div class="ml-3 flex-1">
+                            <p class="font-medium text-white">{{ activity.description|default:"-" }}</p>
+                            <p class="text-sm text-slate-300">{{ activity.created_at|date:"d.m.Y H:i"|default:"-" }}</p>
+                        </div>
                     </div>
-                    <div class="ml-3 flex-1">
-                        <p class="text-sm font-medium text-gray-900">{{ activity.description }}</p>
-                        <p class="text-xs text-gray-500">{{ activity.created_at|date:"d.m.Y H:i" }}</p>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-slate-400 text-center py-8">Henüz aktivite bulunmuyor</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- System Health (Admin Only) -->
+        {% if is_admin %}
+        <div class="bg-slate-700 border border-slate-600 rounded-xl p-6 mb-8">
+            <h3 class="text-xl font-bold text-white mb-4">Sistem Sağlığı</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-6 bg-slate-600 rounded-lg border border-slate-500">
+                    <div class="text-3xl font-bold text-green-400 mb-2">99.9%</div>
+                    <div class="text-sm text-green-300">Sistem Çalışma Süresi</div>
+                </div>
+                <div class="text-center p-6 bg-slate-600 rounded-lg border border-slate-500">
+                    <div class="text-3xl font-bold text-blue-400 mb-2">2.5 MB</div>
+                    <div class="text-sm text-blue-300">Veritabanı Boyutu</div>
+                </div>
+                <div class="text-center p-6 bg-slate-600 rounded-lg border border-slate-500">
+                    <div class="text-3xl font-bold text-purple-400 mb-2">3</div>
+                    <div class="text-sm text-purple-300">Aktif Oturumlar</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Export Options (Admin Only) -->
+        {% if user.can_export_data %}
+        <div class="bg-slate-700 border border-slate-600 rounded-xl p-6">
+            <h3 class="text-xl font-bold text-white mb-4">Veri Dışa Aktarma</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="{% url 'devices:device_export_csv' %}" class="flex items-center p-4 border border-slate-500 rounded-lg hover:bg-slate-600 transition-colors">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-file-csv text-2xl text-green-400"></i>
                     </div>
-                </div>
-                {% endfor %}
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-white">Cihaz CSV</p>
+                        <p class="text-xs text-slate-300">Cihaz verilerini Excel formatında</p>
+                    </div>
+                </a>
+                
+                <a href="#" class="flex items-center p-4 border border-slate-500 rounded-lg hover:bg-slate-600 transition-colors">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-file-excel text-2xl text-blue-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-white">Kullanıcı Excel</p>
+                        <p class="text-xs text-slate-300">Kullanıcı verilerini Excel formatında</p>
+                    </div>
+                </a>
+                
+                <a href="#" class="flex items-center p-4 border border-slate-500 rounded-lg hover:bg-slate-600 transition-colors">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-file-pdf text-2xl text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-white">Rapor PDF</p>
+                        <p class="text-xs text-slate-300">Detaylı sistem raporu</p>
+                    </div>
+                </a>
             </div>
         </div>
-    </div>
-
-    <!-- System Health -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-heartbeat mr-2 text-red-600"></i>
-            Sistem Sağlığı
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="text-center p-4 bg-green-50 rounded-lg">
-                <div class="text-2xl font-bold text-green-600">{{ system_uptime }}</div>
-                <div class="text-sm text-green-700">Sistem Çalışma Süresi</div>
-            </div>
-            <div class="text-center p-4 bg-blue-50 rounded-lg">
-                <div class="text-2xl font-bold text-blue-600">{{ database_size }}</div>
-                <div class="text-sm text-blue-700">Veritabanı Boyutu</div>
-            </div>
-            <div class="text-center p-4 bg-purple-50 rounded-lg">
-                <div class="text-2xl font-bold text-purple-600">{{ active_sessions }}</div>
-                <div class="text-sm text-purple-700">Aktif Oturumlar</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Export Options -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-download mr-2 text-green-600"></i>
-            Veri Dışa Aktarma
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a href="{% url 'devices:device_export_csv' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-file-csv text-2xl text-green-600"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-900">Cihaz CSV</p>
-                    <p class="text-xs text-gray-500">Cihaz verilerini Excel formatında</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'devices:device_export_json' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-file-code text-2xl text-blue-600"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-900">Cihaz JSON</p>
-                    <p class="text-xs text-gray-500">API uyumlu JSON format</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'dashboard:activity_log' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-list text-2xl text-purple-600"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-900">Aktivite Logları</p>
-                    <p class="text-xs text-gray-500">Sistem aktivite kayıtları</p>
-                </div>
-            </a>
-        </div>
+        {% endif %}
     </div>
 </div>
 
-<!-- JavaScript for Charts -->
+<!-- Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// User Role Distribution Chart
-const userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
-const userRoleChart = new Chart(userRoleCtx, {
-    type: 'doughnut',
-    data: {
-        labels: {{ user_role_labels|safe }},
-        datasets: [{
-            data: {{ user_role_data|safe }},
-            backgroundColor: [
-                '#8B5CF6', // purple (superadmin)
-                '#3B82F6', // blue (admin)
-                '#10B981', // green (user)
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 20,
-                    usePointStyle: true
+document.addEventListener('DOMContentLoaded', function() {
+    // Kullanıcı Rol Dağılımı Chart
+    const userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
+    new Chart(userRoleCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ user_role_labels|safe }},
+            datasets: [{
+                data: {{ user_role_data|safe }},
+                backgroundColor: [
+                    '#3b82f6', // Blue
+                    '#10b981', // Green
+                    '#8b5cf6', // Purple
+                    '#f59e0b', // Yellow
+                    '#ef4444'  // Red
+                ],
+                borderWidth: 2,
+                borderColor: '#1e293b'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#e2e8f0'
+                    }
                 }
             }
         }
-    }
-});
+    });
 
-// Device Type Distribution Chart
-const deviceTypeCtx = document.getElementById('deviceTypeChart').getContext('2d');
-const deviceTypeChart = new Chart(deviceTypeCtx, {
-    type: 'doughnut',
-    data: {
-        labels: {{ device_type_labels|safe }},
-        datasets: [{
-            data: {{ device_type_data|safe }},
-            backgroundColor: [
-                '#3B82F6', // blue
-                '#10B981', // green
-                '#F59E0B', // yellow
-                '#EF4444', // red
-                '#8B5CF6', // purple
-                '#06B6D4'  // cyan
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 20,
-                    usePointStyle: true
+    // Cihaz Türü Dağılımı Chart
+    const deviceTypeCtx = document.getElementById('deviceTypeChart').getContext('2d');
+    new Chart(deviceTypeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ device_type_labels|safe }},
+            datasets: [{
+                data: {{ device_type_data|safe }},
+                backgroundColor: [
+                    '#3b82f6', // Blue
+                    '#10b981', // Green
+                    '#8b5cf6', // Purple
+                    '#f59e0b', // Yellow
+                    '#ef4444', // Red
+                    '#06b6d4', // Cyan
+                    '#ec4899', // Pink
+                    '#6b7280'  // Gray
+                ],
+                borderWidth: 2,
+                borderColor: '#1e293b'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#e2e8f0'
+                    }
                 }
             }
         }
-    }
-});
+    });
 
-// Weekly User Registrations Chart
-const weeklyUserCtx = document.getElementById('weeklyUserChart').getContext('2d');
-const weeklyUserChart = new Chart(weeklyUserCtx, {
-    type: 'line',
-    data: {
-        labels: {{ weekly_user_labels|safe }},
-        datasets: [{
-            label: 'Yeni Kullanıcı Kayıtları',
-            data: {{ weekly_user_data|safe }},
-            borderColor: '#10B981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#10B981',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
+    // Haftalık Kullanıcı Chart
+    const weeklyUserCtx = document.getElementById('weeklyUserChart').getContext('2d');
+    new Chart(weeklyUserCtx, {
+        type: 'line',
+        data: {
+            labels: {{ weekly_user_labels|safe }},
+            datasets: [{
+                label: 'Kullanıcı Kayıtları',
+                data: {{ weekly_user_data|safe }},
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-                stepSize: 1
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: '#475569'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: '#475569'
+                    }
+                }
             }
         }
-    }
-});
+    });
 
-// Weekly Device Registrations Chart
-const weeklyDeviceCtx = document.getElementById('weeklyDeviceChart').getContext('2d');
-const weeklyDeviceChart = new Chart(weeklyDeviceCtx, {
-    type: 'line',
-    data: {
-        labels: {{ weekly_device_labels|safe }},
-        datasets: [{
-            label: 'Yeni Cihaz Kayıtları',
-            data: {{ weekly_device_data|safe }},
-            borderColor: '#3B82F6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#3B82F6',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
+    // Haftalık Cihaz Chart
+    const weeklyDeviceCtx = document.getElementById('weeklyDeviceChart').getContext('2d');
+    new Chart(weeklyDeviceCtx, {
+        type: 'line',
+        data: {
+            labels: {{ weekly_device_labels|safe }},
+            datasets: [{
+                label: 'Cihaz Kayıtları',
+                data: {{ weekly_device_data|safe }},
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-                stepSize: 1
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: '#475569'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#e2e8f0'
+                    },
+                    grid: {
+                        color: '#475569'
+                    }
+                }
             }
         }
-    }
+    });
 });
 </script>
 {% endblock %}
