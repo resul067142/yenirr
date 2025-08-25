@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
+import re
 from .models import Device
 
 class DeviceForm(forms.ModelForm):
@@ -10,7 +11,7 @@ class DeviceForm(forms.ModelForm):
         max_length=100,
         required=False,
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'form-input',
             'placeholder': 'Cihaz Adı (Opsiyonel)'
         }),
         label='Cihaz Adı',
@@ -26,26 +27,44 @@ class DeviceForm(forms.ModelForm):
             )
         ],
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'form-input',
             'placeholder': 'GSM Numarası'
         }),
         label='GSM Numarası',
         help_text='Örnek: +905551234567 veya 05551234567'
     )
     
-    device_email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': 'Cihaz E-posta Adresi'
+    device_email = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Dahili Telefon (3534 2255)'
         }),
-        label='Cihaz E-posta Adresi',
-        help_text='Cihaza özel e-posta adresi'
+        label='Dahili Telefon',
+        help_text='Dahili telefon numarası (örn: 3534 2255)'
+    )
+    
+    email_number = forms.CharField(
+        max_length=15,
+        required=False,
+        validators=[
+            RegexValidator(
+                regex=r'^[0-9]{15}$',
+                message='Cihaz E-mail No 15 haneli olmalıdır.'
+            )
+        ],
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': '15 haneli Cihaz E-mail No'
+        }),
+        label='Cihaz E-mail No',
+        help_text='15 haneli cihaz e-mail numarası'
     )
     
     device_type = forms.ChoiceField(
         choices=Device.DEVICE_TYPE_CHOICES,
         widget=forms.Select(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            'class': 'form-select'
         }),
         label='Cihaz Cinsi'
     )
@@ -54,7 +73,7 @@ class DeviceForm(forms.ModelForm):
         max_length=50,
         required=False,
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'form-input',
             'placeholder': 'Marka (Opsiyonel)'
         }),
         label='Marka'
@@ -64,7 +83,7 @@ class DeviceForm(forms.ModelForm):
         max_length=50,
         required=False,
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'form-input',
             'placeholder': 'Model (Opsiyonel)'
         }),
         label='Model'
@@ -80,7 +99,7 @@ class DeviceForm(forms.ModelForm):
             )
         ],
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'form-input',
             'placeholder': 'IMEI Numarası (Opsiyonel)'
         }),
         label='IMEI Numarası',
@@ -90,7 +109,7 @@ class DeviceForm(forms.ModelForm):
     notes = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'form-textarea',
             'rows': 3,
             'placeholder': 'Cihaz hakkında ek bilgiler (Opsiyonel)'
         }),
@@ -101,7 +120,7 @@ class DeviceForm(forms.ModelForm):
         max_length=100,
         required=False,
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'form-input',
             'placeholder': 'Cihaz Birliği (Opsiyonel)'
         }),
         label='Cihaz Birliği',
@@ -110,17 +129,21 @@ class DeviceForm(forms.ModelForm):
     
     class Meta:
         model = Device
-        fields = ['device_name', 'gsm_number', 'device_email', 'device_type', 'brand', 'model', 'imei', 'device_group', 'notes']
+        fields = ['device_name', 'gsm_number', 'device_email', 'email_number', 'device_type', 'brand', 'model', 'imei', 'device_group', 'notes']
     
     def clean_device_email(self):
-        email = self.cleaned_data.get('device_email')
+        phone = self.cleaned_data.get('device_email')
+        # Dahili telefon formatı kontrolü (XXXX XXXX)
+        if phone and not re.match(r'^\d{4}\s\d{4}$', phone):
+            raise forms.ValidationError('Dahili telefon formatı: XXXX XXXX (örn: 3534 2255)')
+        
         if self.instance.pk:  # Düzenleme
-            if Device.objects.exclude(pk=self.instance.pk).filter(device_email=email).exists():
-                raise forms.ValidationError('Bu e-posta adresi zaten kullanılıyor.')
+            if Device.objects.exclude(pk=self.instance.pk).filter(device_email=phone).exists():
+                raise forms.ValidationError('Bu dahili telefon numarası zaten kullanılıyor.')
         else:  # Yeni ekleme
-            if Device.objects.filter(device_email=email).exists():
-                raise forms.ValidationError('Bu e-posta adresi zaten kullanılıyor.')
-        return email
+            if Device.objects.filter(device_email=phone).exists():
+                raise forms.ValidationError('Bu dahili telefon numarası zaten kullanılıyor.')
+        return phone
     
     def clean_gsm_number(self):
         gsm = self.cleaned_data.get('gsm_number')

@@ -4,7 +4,7 @@
 
 {% block extra_css %}
 <style>
-/* Modern Aktivite Logları Tasarımı - Kullanıcı Listesi Stilinde */
+/* Modern Aktivite Logları Tasarımı - Cihazlarım Stilinde */
 .activity-logs-container {
     max-width: 100%;
     margin: 0;
@@ -95,6 +95,18 @@
     100% {
         background-position: 0% 50%;
     }
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
 }
 
 /* Hover Panels Section */
@@ -263,11 +275,25 @@
     color: #ffffff;
 }
 
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
 .form-input:focus, .form-select:focus {
     outline: none;
     border-color: #10b981;
     background: #111827;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-select option {
+    background: #1f2937;
+    color: #ffffff;
+    padding: 8px;
+}
+
+.form-select option:hover {
+    background: #374151;
 }
 
 .search-btn {
@@ -602,9 +628,9 @@
                 <tr>
                     <td>
                         <div class="user-info">
-                            <strong>{{ log.user.username }}</strong>
+                            <strong style="color: #ffffff;">{{ log.user.username }}</strong>
                             {% if log.user.email %}
-                                <br><small class="text-slate-400">{{ log.user.email }}</small>
+                                <br><small style="color: #9ca3af; font-size: 11px;">{{ log.user.email }}</small>
                             {% endif %}
                         </div>
                     </td>
@@ -622,16 +648,16 @@
                     </td>
                     <td>
                         <div class="log-description">
-                            {{ log.description|truncatechars:50 }}
+                            <span style="color: #e2e8f0; font-size: 13px;">{{ log.description|truncatechars:50 }}</span>
                         </div>
                     </td>
                     <td>
-                        <code class="text-xs bg-slate-700 px-2 py-1 rounded">{{ log.ip_address|default:"-" }}</code>
+                        <code style="color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-family: 'Courier New', monospace; border: 1px solid rgba(16, 185, 129, 0.2);">{{ log.ip_address|default:"-" }}</code>
                     </td>
                     <td>
                         <div class="log-date">
-                            <div class="text-sm">{{ log.created_at|date:"d.m.Y" }}</div>
-                            <div class="text-xs text-slate-400">{{ log.created_at|date:"H:i" }}</div>
+                            <div style="color: #ffffff; font-size: 13px; font-weight: 500;">{{ log.created_at|date:"d.m.Y" }}</div>
+                            <div style="color: #9ca3af; font-size: 11px;">{{ log.created_at|date:"H:i" }}</div>
                         </div>
                     </td>
                     <td>
@@ -649,9 +675,9 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;">
-                        <i class="fas fa-list-alt" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-                        <div>Henüz aktivite logu bulunmuyor.</div>
+                    <td colspan="6" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-list-alt" style="font-size: 48px; margin-bottom: 16px; color: #6b7280;"></i>
+                        <div style="color: #9ca3af; font-size: 16px; font-weight: 500;">Henüz aktivite logu bulunmuyor.</div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -686,16 +712,16 @@
 </div>
 
 <!-- Log Details Modal -->
-<div id="logDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+<div id="logDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 backdrop-blur-sm">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-slate-800 border border-slate-600 rounded-lg p-6 max-w-2xl w-full">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-600 rounded-2xl p-6 max-w-2xl w-full shadow-2xl backdrop-filter backdrop-blur-lg" style="animation: slideInUp 0.3s ease;">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-white">Log Detayları</h3>
                 <button onclick="closeLogDetails()" class="text-slate-400 hover:text-white">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="logDetailsContent" class="text-slate-300">
+            <div id="logDetailsContent" class="text-slate-300 space-y-4">
                 <!-- Log detayları buraya yüklenecek -->
             </div>
         </div>
@@ -710,23 +736,29 @@ function showLogDetails(logId) {
         .then(data => {
             document.getElementById('logDetailsContent').innerHTML = `
                 <div class="space-y-4">
-                    <div>
-                        <strong class="text-white">Kullanıcı:</strong> ${data.user}
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid #10b981;">
+                        <strong style="color: #ffffff; display: block; margin-bottom: 4px;">Kullanıcı:</strong>
+                        <span style="color: #e2e8f0; font-size: 14px;">${data.user}</span>
                     </div>
-                    <div>
-                        <strong class="text-white">Log Tipi:</strong> ${data.log_type}
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid #3b82f6;">
+                        <strong style="color: #ffffff; display: block; margin-bottom: 4px;">Log Tipi:</strong>
+                        <span style="color: #e2e8f0; font-size: 14px;">${data.log_type}</span>
                     </div>
-                    <div>
-                        <strong class="text-white">Açıklama:</strong> ${data.description}
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid #8b5cf6;">
+                        <strong style="color: #ffffff; display: block; margin-bottom: 4px;">Açıklama:</strong>
+                        <span style="color: #e2e8f0; font-size: 14px;">${data.description}</span>
                     </div>
-                    <div>
-                        <strong class="text-white">IP Adresi:</strong> ${data.ip_address}
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid #f59e0b;">
+                        <strong style="color: #ffffff; display: block; margin-bottom: 4px;">IP Adresi:</strong>
+                        <span style="color: #10b981; font-family: 'Courier New', monospace; font-size: 13px;">${data.ip_address}</span>
                     </div>
-                    <div>
-                        <strong class="text-white">User Agent:</strong> ${data.user_agent}
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid #ef4444;">
+                        <strong style="color: #ffffff; display: block; margin-bottom: 4px;">User Agent:</strong>
+                        <span style="color: #9ca3af; font-size: 12px; font-family: 'Courier New', monospace;">${data.user_agent}</span>
                     </div>
-                    <div>
-                        <strong class="text-white">Tarih:</strong> ${data.created_at}
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border-left: 3px solid #06b6d4;">
+                        <strong style="color: #ffffff; display: block; margin-bottom: 4px;">Tarih:</strong>
+                        <span style="color: #e2e8f0; font-size: 14px;">${data.created_at}</span>
                     </div>
                 </div>
             `;
@@ -780,4 +812,17 @@ document.addEventListener('keydown', function(e) {
     }
 });
 </script>
+
+<style>
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
 {% endblock %}

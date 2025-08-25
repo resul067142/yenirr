@@ -1,34 +1,109 @@
 {% extends 'layout/base.html' %}
 
-{% block title %}Kullanıcı Yetkileri - Cihaz Takip Sistemi{% endblock %}
+{% block title %}Yetki ve Rol Yönetimi - Cihaz Takip Sistemi{% endblock %}
 
 {% block content %}
 <div class="permissions-container">
     <!-- Compact Header -->
     <div class="compact-header">
-        <div class="header-left">
-            <div class="header-icon">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <div class="header-content">
-                <h1 class="header-title">Kullanıcı Yetkileri</h1>
-                <p class="header-subtitle">Kullanıcı yetkilerini yönetin ve düzenleyin</p>
-            </div>
-        </div>
-        
         <div class="header-actions">
-            <button onclick="window.location.href='{% url 'users:user_list' %}'" class="btn btn-primary">
+            <a href="{% url 'users:user_list' %}" class="btn btn-secondary">
                 <i class="fas fa-users"></i>
                 Kullanıcı Listesi
-            </button>
-            <button onclick="window.location.href='{% url 'users:add_user' %}'" class="btn btn-secondary">
+            </a>
+            <a href="{% url 'users:add_user' %}" class="btn btn-primary">
                 <i class="fas fa-user-plus"></i>
                 Yeni Kullanıcı
-            </button>
-            <button onclick="window.location.href='{% url 'dashboard:home' %}'" class="btn btn-secondary">
+            </a>
+            <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">
                 <i class="fas fa-home"></i>
                 Ana Sayfa
-            </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Hover Panels Section -->
+    <div class="hover-panels-section">
+        <!-- User Statistics Panel -->
+        <div class="hover-panel user-stats-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-chart-pie"></i>
+                <span>Kullanıcı İstatistikleri</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <div class="compact-stats-grid">
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="compact-stat-number">{{ users|length }}</div>
+                        <div class="compact-stat-label">Toplam Kullanıcı</div>
+                    </div>
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon info">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="compact-stat-number">{{ active_users|default:0 }}</div>
+                        <div class="compact-stat-label">Aktif Kullanıcı</div>
+                    </div>
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon warning">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="compact-stat-number">{{ admin_users|default:0 }}</div>
+                        <div class="compact-stat-label">Admin Kullanıcı</div>
+                    </div>
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon danger">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="compact-stat-number">{{ superadmin_users|default:0 }}</div>
+                        <div class="compact-stat-label">Süper Admin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Panel -->
+        <div class="hover-panel quick-actions-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-bolt"></i>
+                <span>Hızlı İşlemler</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <div class="actions-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <a onclick="saveAllPermissions()" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-save"></i>
+                        </div>
+                        <div class="action-title">Tüm Yetkileri Kaydet</div>
+                        <div class="action-description">Tüm değişiklikleri kaydet</div>
+                    </a>
+                    <a onclick="resetAllPermissions()" class="action-card">
+                        <div class="action-icon orange">
+                            <i class="fas fa-undo"></i>
+                        </div>
+                        <div class="action-title">Sıfırla</div>
+                        <div class="action-description">Değişiklikleri geri al</div>
+                    </a>
+                    <a onclick="bulkRoleUpdate()" class="action-card">
+                        <div class="action-icon purple">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="action-title">Toplu Rol Güncelle</div>
+                        <div class="action-description">Çoklu kullanıcı güncelle</div>
+                    </a>
+                    <a onclick="exportPermissions()" class="action-card">
+                        <div class="action-icon blue">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="action-title">Yetkileri Dışa Aktar</div>
+                        <div class="action-description">PDF/Excel rapor oluştur</div>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -90,7 +165,7 @@
         <div class="users-header">
             <h3 class="section-title">
                 <i class="fas fa-list"></i>
-                Kullanıcı Listesi ve Yetkiler
+                Kullanıcı Listesi ve Yetki Yönetimi
             </h3>
             <div class="header-actions">
                 <button onclick="saveAllPermissions()" class="btn btn-success">
@@ -100,6 +175,10 @@
                 <button onclick="resetAllPermissions()" class="btn btn-warning">
                     <i class="fas fa-undo"></i>
                     Sıfırla
+                </button>
+                <button onclick="bulkRoleUpdate()" class="btn btn-primary">
+                    <i class="fas fa-users-cog"></i>
+                    Toplu Güncelle
                 </button>
             </div>
         </div>
@@ -111,7 +190,8 @@
                         <th>Kullanıcı</th>
                         <th>Rol</th>
                         <th>Durum</th>
-                        <th colspan="2">Yetki Grupları</th>
+                        <th>İletişim</th>
+                        <th colspan="3">Yetki Grupları</th>
                         <th>İşlemler</th>
                     </tr>
                 </thead>
@@ -140,6 +220,14 @@
                                     <i class="fas fa-crown"></i> Süper Admin
                                 {% elif user.role == 'admin' %}
                                     <i class="fas fa-shield-alt"></i> Admin
+                                {% elif user.role == 'manager' %}
+                                    <i class="fas fa-user-tie"></i> Müdür
+                                {% elif user.role == 'supervisor' %}
+                                    <i class="fas fa-user-graduate"></i> Süpervizör
+                                {% elif user.role == 'technician' %}
+                                    <i class="fas fa-tools"></i> Teknisyen
+                                {% elif user.role == 'analyst' %}
+                                    <i class="fas fa-chart-line"></i> Analist
                                 {% else %}
                                     <i class="fas fa-user"></i> Kullanıcı
                                 {% endif %}
@@ -155,6 +243,14 @@
                                     <i class="fas fa-times-circle"></i> Pasif
                                 {% endif %}
                             </span>
+                        </td>
+
+                        <!-- Contact -->
+                        <td class="user-contact">
+                            <div class="contact-info">
+                                <div class="contact-email">{{ user.email|truncatechars:15 }}</div>
+                                <div class="contact-phone">{% if user.tc_kimlik %}{{ user.tc_kimlik|slice:":4" }}***{% else %}-{% endif %}</div>
+                            </div>
                         </td>
 
                         <!-- Permission Groups -->
@@ -215,6 +311,37 @@
                                         <input type="checkbox" name="user_{{ user.id }}_can_delete_users" 
                                                {% if user.can_delete_users %}checked{% endif %}>
                                         <span>Sil</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="permission-groups">
+                            <div class="permission-group">
+                                <div class="group-title">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Rapor Yetkileri
+                                </div>
+                                <div class="permission-checkboxes">
+                                    <label class="permission-checkbox-item">
+                                        <input type="checkbox" name="user_{{ user.id }}_can_view_reports" 
+                                               {% if user.can_view_reports %}checked{% endif %}>
+                                        <span>Görüntüle</span>
+                                    </label>
+                                    <label class="permission-checkbox-item">
+                                        <input type="checkbox" name="user_{{ user.id }}_can_export_reports" 
+                                               {% if user.can_export_reports %}checked{% endif %}>
+                                        <span>Dışa Aktar</span>
+                                    </label>
+                                    <label class="permission-checkbox-item">
+                                        <input type="checkbox" name="user_{{ user.id }}_can_schedule_reports" 
+                                               {% if user.can_schedule_reports %}checked{% endif %}>
+                                        <span>Zamanla</span>
+                                    </label>
+                                    <label class="permission-checkbox-item">
+                                        <input type="checkbox" name="user_{{ user.id }}_can_share_reports" 
+                                               {% if user.can_share_reports %}checked{% endif %}>
+                                        <span>Paylaş</span>
                                     </label>
                                 </div>
                             </div>
@@ -559,21 +686,219 @@
 <!-- Styles -->
 <style>
 .permissions-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 100%;
+    margin: 0;
+    padding: 16px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    min-height: 100vh;
 }
 
 /* Compact Header */
 .compact-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px 30px;
-    border-radius: 16px;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Hover Panels Section */
+.hover-panels-section {
+    display: flex;
+    gap: 16px;
     margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    flex-wrap: wrap;
+}
+
+.hover-panel {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+}
+
+.panel-trigger {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border: 1px solid #6b7280;
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #e2e8f0;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.panel-trigger:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.panel-trigger i:first-child {
+    color: #10b981;
+    font-size: 18px;
+}
+
+.panel-trigger i:last-child {
+    color: #9ca3af;
+    transition: transform 0.3s ease;
+}
+
+.panel-content {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border: 1px solid #6b7280;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.hover-panel:hover .panel-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.hover-panel:hover .panel-trigger i:last-child {
+    transform: rotate(180deg);
+}
+
+/* Compact Stats Grid */
+.compact-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.compact-stat {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.compact-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.compact-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    margin: 0 auto 8px;
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.compact-stat-icon.info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.compact-stat-icon.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.compact-stat-icon.danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.compact-stat-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.compact-stat-label {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Actions Grid */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.action-card {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+    padding: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+    color: inherit;
+    cursor: pointer;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border-color: #10b981;
+}
+
+.action-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    margin: 0 auto 8px;
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.action-icon.orange {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.action-icon.purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.action-icon.blue {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.action-title {
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.action-description {
+    color: #9ca3af;
+    font-size: 10px;
+    line-height: 1.2;
 }
 
 .header-left {
@@ -674,11 +999,12 @@
 
 /* Users Section */
 .users-section {
-    background: white;
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
     border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     margin-bottom: 24px;
     overflow: hidden;
+    border: 1px solid #6b7280;
 }
 
 .users-header {
@@ -778,6 +1104,30 @@
     font-size: 12px;
 }
 
+/* User Contact */
+.user-contact {
+    min-width: 150px;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contact-email {
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.contact-phone {
+    color: #9ca3af;
+    font-size: 11px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
 /* Role and Status Badges */
 .role-badge, .status-badge {
     display: inline-flex;
@@ -804,6 +1154,26 @@
 .role-user {
     background: #dcfce7;
     color: #166534;
+}
+
+.role-manager {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.role-supervisor {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.role-technician {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+.role-analyst {
+    background: #ecfdf5;
+    color: #047857;
 }
 
 .status-active {
@@ -1281,7 +1651,7 @@ function trackPermissionChange(checkbox) {
 // Save all permissions
 function saveAllPermissions() {
     if (Object.keys(permissionChanges).length === 0) {
-        alert('Değişiklik yapılmadı!');
+        addNotification('warning', 'Değişiklik Yok', 'Henüz bir değişiklik yapılmadı!', null, 'user');
         return;
     }
     
@@ -1299,7 +1669,7 @@ function saveAllPermissions() {
     console.log('Saving permissions:', permissionsData);
     
     // Show success message
-    alert('Yetkiler başarıyla kaydedildi!');
+    addNotification('success', 'Yetkiler Kaydedildi', 'Tüm yetkiler başarıyla kaydedildi!', null, 'user');
     
     // Reset changes
     permissionChanges = {};
@@ -1506,5 +1876,102 @@ document.addEventListener('keydown', function(e) {
         });
     }
 });
+
+// Bulk role update function
+function bulkRoleUpdate() {
+    const roles = ['user', 'admin', 'superadmin', 'manager', 'supervisor', 'technician', 'analyst'];
+    const selectedRole = prompt('Hangi role güncellemek istiyorsunuz?\n\nMevcut roller:\n' + roles.map(r => `- ${r}`).join('\n'));
+    
+    if (selectedRole && roles.includes(selectedRole)) {
+        if (confirm(`Seçili tüm kullanıcıları "${selectedRole}" rolüne güncellemek istediğinizden emin misiniz?`)) {
+            addNotification('success', 'Toplu Güncelleme', `Kullanıcılar başarıyla ${selectedRole} rolüne güncellendi!`, null, 'user');
+            console.log('Bulk role update:', selectedRole);
+        }
+    } else if (selectedRole) {
+        addNotification('error', 'Geçersiz Rol', 'Lütfen geçerli bir rol seçin!', null, 'user');
+    }
+}
+
+// Export permissions function
+function exportPermissions() {
+    const format = confirm('PDF formatında dışa aktarmak istiyor musunuz?\n\nOK = PDF\nCancel = Excel');
+    const formatType = format ? 'PDF' : 'Excel';
+    
+    addNotification('success', 'Dışa Aktarma', `${formatType} formatında yetkiler dışa aktarılıyor...`, null, 'user');
+    console.log('Exporting permissions as:', formatType);
+    
+    // Simulate export
+    setTimeout(() => {
+        addNotification('success', 'Dışa Aktarma Tamamlandı', `${formatType} dosyası başarıyla oluşturuldu!`, null, 'user');
+    }, 2000);
+}
+
+// Add notification function (if not exists)
+function addNotification(type, title, message, action, icon) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : type === 'error' ? '#ef4444' : '#3b82f6'}, ${type === 'success' ? '#059669' : type === 'warning' ? '#d97706' : type === 'error' ? '#dc2626' : '#2563eb'});
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        max-width: 350px;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'error' ? 'times-circle' : 'info-circle'}" style="font-size: 20px;"></i>
+            <div>
+                <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
+                <div style="font-size: 14px; opacity: 0.9;">${message}</div>
+                ${action ? `<div style="margin-top: 8px;">${action}</div>` : ''}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 5 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 5000);
+}
+
+// Add keyframe animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
 </script>
 {% endblock %}

@@ -1,252 +1,269 @@
 {% extends 'layout/base.html' %}
 
-{% block title %}Profil - Cihaz Takip Sistemi{% endblock %}
+{% block title %}Kullanıcı Profili - Cihaz Takip Sistemi{% endblock %}
 
 {% block extra_css %}
 <style>
-/* Modern Profil Tasarımı - Kompakt Tek Ekran + Dinamik Efektler */
+/* Modern Profil Tasarımı - Cihazlarım Stilinde */
 .profile-container {
-    width: 100%;
+    max-width: 100%;
     margin: 0;
-    padding: 8px;
-    background: linear-gradient(135deg, #fafbfc 0%, #f1f5f9 100%);
-    height: 100vh;
-    overflow: hidden;
-    box-sizing: border-box;
-    position: relative;
+    padding: 16px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    min-height: 100vh;
 }
 
-.profile-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-.profile-container > * {
-    width: 100%;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 1;
-}
-
-/* Compact Header - Dinamik */
+/* Compact Header */
 .compact-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 12px 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.compact-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent);
-    transition: left 0.6s ease;
-}
-
-.compact-header:hover::before {
-    left: 100%;
-}
-
-.compact-header:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border-color: #3b82f6;
-}
-
-.header-content h1 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-.compact-header:hover .header-content h1 {
-    color: #3b82f6;
-}
-
-.header-content h1 i {
-    color: #3b82f6;
-    font-size: 24px;
-    transition: all 0.3s ease;
-}
-
-.compact-header:hover .header-content h1 i {
-    transform: scale(1.1) rotate(5deg);
+    justify-content: flex-end;
+    margin-bottom: 16px;
 }
 
 .header-actions {
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-/* Buton Stilleri - Gelişmiş Animasyonlar */
+/* Buton Stilleri */
 .btn {
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     border: none;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     text-decoration: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transition: all 0.6s ease;
-    transform: translate(-50%, -50%);
-}
-
-.btn:hover::before {
-    width: 300px;
-    height: 300px;
 }
 
 .btn-primary {
-    background: linear-gradient(45deg, #3b82f6, #1d4ed8, #7c3aed, #3b82f6);
+    background: linear-gradient(45deg, #10b981, #059669, #3b82f6, #8b5cf6);
     background-size: 400% 400%;
     color: white;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     animation: gradientShift 3s ease infinite;
     position: relative;
     overflow: hidden;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
     animation-duration: 1.5s;
 }
 
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 .btn-secondary {
-    background: linear-gradient(45deg, #f1f5f9, #e2e8f0, #cbd5e1, #94a3b8);
+    background: linear-gradient(45deg, #64748b, #475569, #334155, #1e293b);
     background-size: 400% 400%;
-    color: #475569;
-    border: 1px solid #e2e8f0;
+    color: #e2e8f0;
+    border: 1px solid #64748b;
     animation: gradientShiftSecondary 4s ease infinite;
     position: relative;
     overflow: hidden;
 }
 
 .btn-secondary:hover {
-    color: #334155;
-    transform: translateY(-2px) scale(1.02);
+    color: #ffffff;
+    transform: translateY(-2px);
     animation-duration: 2s;
-    border-color: #3b82f6;
-}
-
-.btn-success {
-    background: linear-gradient(45deg, #10b981, #059669, #34d399, #10b981);
-    background-size: 400% 400%;
-    color: white;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
-    animation: gradientShift 3s ease infinite;
-}
-
-.btn-success:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-}
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
 
 @keyframes gradientShiftSecondary {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-/* Ana İçerik - Yatay Düzen + Animasyonlar */
-.profile-main-content {
+.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* Hover Panels Section */
+.hover-panels-section {
     display: flex;
     gap: 16px;
-    height: calc(100vh - 120px);
-    width: 100%;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
 }
 
-/* Sol Kolon - Profil Bilgileri */
-.left-column {
+.hover-panel {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-width: 0;
+    min-width: 300px;
+    position: relative;
 }
 
-/* Profil Hero - Kompakt + Dinamik */
-.profile-hero {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+.panel-trigger {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border: 1px solid #6b7280;
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 20px;
-    height: 120px;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
+    justify-content: space-between;
+    color: #e2e8f0;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.profile-hero::before {
-    content: '';
+.panel-trigger:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.panel-trigger i:first-child {
+    color: #10b981;
+    font-size: 18px;
+}
+
+.panel-trigger i:last-child {
+    color: #9ca3af;
+    transition: transform 0.3s ease;
+}
+
+.panel-content {
     position: absolute;
-    top: 0;
+    top: calc(100% + 8px);
     left: 0;
     right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981, #f59e0b);
-    background-size: 400% 100%;
-    animation: gradientShift 4s ease infinite;
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border: 1px solid #6b7280;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
-.profile-hero:hover {
+.hover-panel:hover .panel-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.hover-panel:hover .panel-trigger i:last-child {
+    transform: rotate(180deg);
+}
+
+/* Compact Stats Grid */
+.compact-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.compact-stat {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.compact-stat:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    border-color: #3b82f6;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.compact-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    margin: 0 auto 8px;
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.compact-stat-icon.info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.compact-stat-icon.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.compact-stat-icon.danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.compact-stat-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.compact-stat-label {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Profil Hero Section */
+.profile-hero {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 24px;
 }
 
 .profile-avatar-section {
@@ -258,44 +275,22 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 3px solid #3b82f6;
+    border: 3px solid #10b981;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
 }
 
 .profile-avatar:hover {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
-    border-color: #8b5cf6;
-}
-
-.profile-avatar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.profile-avatar:hover::before {
-    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
 }
 
 .profile-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: all 0.4s ease;
-}
-
-.profile-avatar:hover img {
-    transform: scale(1.1);
 }
 
 .profile-avatar i {
@@ -304,15 +299,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #94a3b8;
+    color: #9ca3af;
     font-size: 32px;
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    transition: all 0.3s ease;
-}
-
-.profile-avatar:hover i {
-    color: #3b82f6;
-    transform: scale(1.1);
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
 }
 
 .avatar-upload {
@@ -340,1065 +329,354 @@
 .avatar-overlay i {
     color: white;
     font-size: 16px;
-    transform: scale(0.8);
-    transition: transform 0.3s ease;
-}
-
-.avatar-upload:hover .avatar-overlay i {
-    transform: scale(1.2);
 }
 
 .profile-info {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    color: #ffffff;
 }
 
 .profile-name {
     font-size: 24px;
-    font-weight: 800;
-    color: #1e293b;
-    margin-bottom: 4px;
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    transition: all 0.3s ease;
-}
-
-.profile-hero:hover .profile-name {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #ffffff;
 }
 
 .profile-username {
-    color: #64748b;
     font-size: 14px;
-    margin-bottom: 8px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.profile-hero:hover .profile-username {
-    color: #475569;
+    color: #9ca3af;
+    margin-bottom: 12px;
 }
 
 .profile-role {
     display: inline-block;
     padding: 6px 12px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(135deg, #10b981, #059669);
     color: white;
     border-radius: 16px;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 12px;
-    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.25);
-    position: relative;
-    overflow: hidden;
-    width: fit-content;
-    transition: all 0.3s ease;
-}
-
-.profile-role::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.profile-role:hover::before {
-    left: 100%;
-}
-
-.profile-role:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
 
 .profile-actions {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     flex-shrink: 0;
 }
 
-/* Profil Form - Kompakt + Dinamik */
-.profile-form-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
+/* Profil Detayları Section */
+.profile-details-section {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #6b7280;
+    margin-bottom: 24px;
 }
 
-.profile-form-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
-    background-size: 300% 100%;
-    animation: gradientShift 5s ease infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.profile-form-card:hover::before {
-    opacity: 1;
-}
-
-.profile-form-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: #3b82f6;
-}
-
-.form-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
+.section-header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
-.profile-form-card:hover .form-title {
-    color: #3b82f6;
+.section-title {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
 }
 
-.form-title i {
-    color: #3b82f6;
-    font-size: 16px;
-    transition: all 0.3s ease;
+.section-title i {
+    color: #10b981;
 }
 
-.profile-form-card:hover .form-title i {
-    transform: scale(1.1) rotate(5deg);
-}
-
-/* Form Grid - 2 Sütun + Animasyonlar */
+/* Form Grid */
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
 }
 
 .form-group {
     margin-bottom: 0;
-    transition: all 0.3s ease;
-}
-
-.form-group:hover {
-    transform: translateX(2px);
 }
 
 .form-label {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
-    transition: all 0.3s ease;
-}
-
-.form-group:hover .form-label {
-    color: #3b82f6;
+    color: #e2e8f0;
+    margin-bottom: 8px;
 }
 
 .form-input, .form-select {
     width: 100%;
-    padding: 6px 10px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(135deg, #fafafa 0%, #f8fafc 100%);
-    color: #1f2937;
+    padding: 10px 12px;
+    border: 1px solid #6b7280;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #1f2937;
+    color: #ffffff;
     box-sizing: border-box;
-    font-weight: 500;
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
 }
 
 .form-input:focus, .form-select:focus {
     outline: none;
-    border-color: #3b82f6;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    transform: translateY(-1px) scale(1.02);
-}
-
-.form-input:hover, .form-select:hover {
-    border-color: #3b82f6;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    transform: translateY(-1px);
+    border-color: #10b981;
+    background: #111827;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .form-input[type="email"] {
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     letter-spacing: 0.2px;
-    font-size: 11px;
 }
 
-/* Hızlı Erişim - Kompakt + Dinamik */
-.quick-actions-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.quick-actions-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
-    background-size: 300% 100%;
-    animation: gradientShift 6s ease infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.quick-actions-card:hover::before {
-    opacity: 1;
-}
-
-.quick-actions-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: #10b981;
-}
-
-.actions-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
+.form-actions {
+    margin-top: 20px;
     display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
+    gap: 12px;
+    justify-content: flex-end;
 }
 
-.quick-actions-card:hover .actions-title {
-    color: #10b981;
-}
-
-.actions-title i {
-    color: #10b981;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.quick-actions-card:hover .actions-title i {
-    transform: scale(1.1) rotate(5deg);
+/* Quick Actions Grid */
+.quick-actions-section {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #6b7280;
+    margin-bottom: 24px;
 }
 
 .actions-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
 }
 
 .action-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border: 1px solid #4b5563;
+    border-radius: 12px;
+    padding: 20px;
     text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
     color: inherit;
-    position: relative;
-    overflow: hidden;
-}
-
-.action-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent);
-    transition: left 0.6s ease;
-}
-
-.action-card:hover::before {
-    left: 100%;
 }
 
 .action-card:hover {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    transform: translateX(4px) translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-    border-color: #3b82f6;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: #10b981;
 }
 
 .action-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 20px;
     color: white;
-    flex-shrink: 0;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #10b981, #059669);
 }
 
-.action-card:hover .action-icon {
-    transform: scale(1.15) rotate(8deg);
+.action-icon.blue {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
-.action-icon.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-.action-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
-.action-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-.action-icon.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-
-.action-content h4 {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 2px;
-    transition: all 0.3s ease;
+.action-icon.purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
 }
 
-.action-card:hover .action-content h4 {
-    color: #3b82f6;
+.action-icon.orange {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-.action-content p {
-    font-size: 11px;
-    color: #64748b;
-    margin: 0;
-    line-height: 1.2;
-    transition: all 0.3s ease;
-}
-
-.action-card:hover .action-content p {
-    color: #475569;
-}
-
-/* Sağ Sidebar - Kompakt + Dinamik */
-.right-sidebar {
-    width: 280px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* Son Aktiviteler - Kompakt + Dinamik */
-.activities-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.activities-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981);
-    background-size: 300% 100%;
-    animation: gradientShift 7s ease infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.activities-card:hover::before {
-    opacity: 1;
-}
-
-.activities-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: #8b5cf6;
-}
-
-.activities-title {
+.action-title {
+    color: #e2e8f0;
     font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.action-description {
+    color: #9ca3af;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Statistics Section */
+.statistics-section {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #6b7280;
+    margin-bottom: 24px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border: 1px solid #4b5563;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    border-color: #3b82f6;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
-.activities-card:hover .activities-title {
-    color: #8b5cf6;
+.stat-icon.green {
+    background: linear-gradient(135deg, #10b981, #059669);
 }
 
-.activities-title i {
-    color: #8b5cf6;
+.stat-icon.purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.stat-icon.orange {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.stat-value {
+    color: #ffffff;
     font-size: 16px;
-    transition: all 0.3s ease;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
-.activities-card:hover .activities-title i {
-    transform: scale(1.1) rotate(5deg);
+.stat-label {
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Recent Activities Section */
+.activities-section {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #6b7280;
 }
 
 .activities-list {
-    max-height: 180px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-
-.activities-list::-webkit-scrollbar {
-    width: 4px;
-}
-
-.activities-list::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 2px;
-}
-
-.activities-list::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-.activities-list::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .activity-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid #f1f5f9;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.activity-item::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 2px;
-    opacity: 0;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border: 1px solid #4b5563;
+    border-radius: 12px;
     transition: all 0.3s ease;
-}
-
-.activity-item:hover::before {
-    opacity: 1;
 }
 
 .activity-item:hover {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 6px;
-    padding: 8px 8px;
-    margin: 0 -8px;
     transform: translateX(4px);
-}
-
-.activity-item:last-child {
-    border-bottom: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border-color: #10b981;
 }
 
 .activity-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 16px;
     color: white;
-    flex-shrink: 0;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #10b981, #059669);
 }
 
-.activity-item:hover .activity-icon {
-    transform: scale(1.2) rotate(5deg);
+.activity-icon.login {
+    background: linear-gradient(135deg, #10b981, #059669);
 }
 
-.activity-icon.login { background: linear-gradient(135deg, #10b981, #059669); }
-.activity-icon.logout { background: linear-gradient(135deg, #ef4444, #dc2626); }
-.activity-icon.update { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-.activity-icon.create { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.activity-icon.logout {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.activity-icon.update {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.activity-icon.create {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
 
 .activity-content {
     flex: 1;
-    min-width: 0;
 }
 
 .activity-title {
-    font-size: 12px;
+    color: #e2e8f0;
+    font-size: 14px;
     font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: all 0.3s ease;
-}
-
-.activity-item:hover .activity-title {
-    color: #3b82f6;
+    margin-bottom: 4px;
 }
 
 .activity-time {
-    font-size: 10px;
-    color: #64748b;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.activity-item:hover .activity-time {
-    color: #475569;
-}
-
-/* Hesap Durumu - Kompakt + Dinamik */
-.status-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.status-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #f59e0b, #10b981, #3b82f6);
-    background-size: 300% 100%;
-    animation: gradientShift 8s ease infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.status-card:hover::before {
-    opacity: 1;
-}
-
-.status-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: #f59e0b;
-}
-
-.status-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-}
-
-.status-card:hover .status-title {
-    color: #f59e0b;
-}
-
-.status-title i {
-    color: #f59e0b;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.status-card:hover .status-title i {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.account-status {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.status-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    transition: all 0.3s ease;
-    border-radius: 4px;
-    padding-left: 8px;
-}
-
-.status-item:hover {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    transform: translateX(4px);
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-}
-
-.status-item:hover .status-dot {
-    transform: scale(1.3);
-}
-
-.status-dot.active { background: #10b981; }
-.status-dot.info { background: #3b82f6; }
-.status-dot.warning { background: #8b5cf6; }
-
-.status-text {
-    font-size: 11px;
-    color: #374151;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.status-item:hover .status-text {
-    color: #1e293b;
-    font-weight: 600;
-}
-
-/* Hızlı İstatistikler - Kompakt + Dinamik */
-.stats-overview-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.stats-overview-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #f59e0b, #10b981, #3b82f6, #8b5cf6);
-    background-size: 400% 100%;
-    animation: gradientShift 9s ease infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.stats-overview-card:hover::before {
-    opacity: 1;
-}
-
-.stats-overview-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: #f59e0b;
-}
-
-.stats-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-}
-
-.stats-overview-card:hover .stats-title {
-    color: #f59e0b;
-}
-
-.stats-title i {
-    color: #f59e0b;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.stats-overview-card:hover .stats-title i {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.stat-item:hover {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    transform: translateX(2px);
-    border-color: #3b82f6;
-}
-
-.stat-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: white;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-}
-
-.stat-item:hover .stat-icon {
-    transform: scale(1.1);
-}
-
-.stat-icon.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-.stat-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
-.stat-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-.stat-icon.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-
-.stat-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.stat-value {
+    color: #9ca3af;
     font-size: 12px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.stat-label {
-    font-size: 10px;
-    color: #64748b;
-    font-weight: 500;
-}
-
-/* Sistem Bilgileri - Kompakt + Dinamik */
-.system-info-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.system-info-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #3b82f6);
-    background-size: 400% 100%;
-    animation: gradientShift 10s ease infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.system-info-card:hover::before {
-    opacity: 1;
-}
-
-.system-info-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: #ef4444;
-}
-
-.system-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-}
-
-.system-info-card:hover .system-title {
-    color: #ef4444;
-}
-
-.system-title i {
-    color: #ef4444;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.system-info-card:hover .system-title i {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.system-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.system-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
-}
-
-.system-item:hover {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    transform: translateX(2px);
-    border-color: #ef4444;
-}
-
-.system-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: white;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-}
-
-.system-item:hover .system-icon {
-    transform: scale(1.1);
-}
-
-.system-icon.info { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-.system-icon.success { background: linear-gradient(135deg, #10b981, #059669); }
-.system-icon.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.system-icon.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
-
-.system-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.system-value {
-    font-size: 11px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.system-label {
-    font-size: 9px;
-    color: #64748b;
-    font-weight: 500;
-}
-
-/* Son Giriş Detayları - Kompakt + Dinamik */
-.login-details-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.login-details-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6);
-    background-size: 300% 100%;
-    animation: gradientShift 11s ease infinite;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.login-details-card:hover::before {
-    opacity: 1;
-}
-
-.login-details-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: #06b6d4;
-}
-
-.login-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-}
-
-.login-details-card:hover .login-title {
-    color: #06b6d4;
-}
-
-.login-title i {
-    color: #06b6d4;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.login-details-card:hover .login-title i {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.login-details {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.detail-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    transition: all 0.3s ease;
-    border-radius: 4px;
-    padding-left: 6px;
-}
-
-.detail-item:hover {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    transform: translateX(3px);
-}
-
-.detail-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    background: linear-gradient(135deg, #06b6d4, #3b82f6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: white;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-}
-
-.detail-item:hover .detail-icon {
-    transform: scale(1.2);
-}
-
-.detail-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.detail-label {
-    font-size: 10px;
-    color: #64748b;
-    font-weight: 500;
-    margin-bottom: 1px;
-}
-
-.detail-value {
-    font-size: 11px;
-    color: #1e293b;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 /* Responsive */
-@media (max-width: 1200px) {
-    .profile-main-content {
-        width: 100%;
-    }
-    
-    .right-sidebar {
-        width: 260px;
-    }
-}
-
-@media (max-width: 1024px) {
-    .profile-main-content {
+@media (max-width: 768px) {
+    .hover-panels-section {
         flex-direction: column;
-        height: auto;
-        overflow-y: auto;
     }
     
-    .right-sidebar {
-        width: 100%;
+    .hover-panel {
+        min-width: 100%;
+    }
+    
+    .compact-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .form-grid {
@@ -1408,6 +686,19 @@
     .actions-grid {
         grid-template-columns: 1fr;
     }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .profile-hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-actions {
+        justify-content: center;
+    }
 }
 </style>
 {% endblock %}
@@ -1416,18 +707,102 @@
 <div class="profile-container">
     <!-- Compact Header -->
     <div class="compact-header">
-        <div class="header-content">
-            <h1>
-                <i class="fas fa-user-circle"></i>
-                Kullanıcı Profili
-            </h1>
-        </div>
-        
         <div class="header-actions">
             <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">
                 <i class="fas fa-home"></i>
                 Ana Sayfa
             </a>
+        </div>
+    </div>
+
+    <!-- Hover Panels Section -->
+    <div class="hover-panels-section">
+        <!-- User Info Hover Panel -->
+        <div class="hover-panel user-info-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-user"></i>
+                <span>Kullanıcı Bilgileri</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <div class="compact-stats-grid">
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="compact-stat-number">{{ user.date_joined|date:"d.m.Y" }}</div>
+                        <div class="compact-stat-label">Üyelik Tarihi</div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon info">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="compact-stat-number">{{ user.last_login|date:"d.m.Y"|default:"-" }}</div>
+                        <div class="compact-stat-label">Son Giriş</div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon warning">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="compact-stat-number">{{ user.get_role_display }}</div>
+                        <div class="compact-stat-label">Kullanıcı Rolü</div>
+                    </div>
+                    
+                    <div class="compact-stat">
+                        <div class="compact-stat-icon {% if user.is_active %}info{% else %}danger{% endif %}">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="compact-stat-number">{% if user.is_active %}Aktif{% else %}Pasif{% endif %}</div>
+                        <div class="compact-stat-label">Hesap Durumu</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Hover Panel -->
+        <div class="hover-panel quick-actions-panel">
+            <div class="panel-trigger">
+                <i class="fas fa-bolt"></i>
+                <span>Hızlı İşlemler</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="panel-content">
+                <div class="actions-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <a href="{% url 'users:change_password' %}" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="action-title">Şifre Değiştir</div>
+                        <div class="action-description">Güvenlik için şifrenizi güncelleyin</div>
+                    </a>
+                    
+                    <a href="{% url 'users:edit_user' user.id %}" class="action-card">
+                        <div class="action-icon blue">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="action-title">Profili Düzenle</div>
+                        <div class="action-description">Kişisel bilgilerinizi güncelleyin</div>
+                    </a>
+                    
+                    <a href="{% url 'dashboard:home' %}" class="action-card">
+                        <div class="action-icon orange">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="action-title">Ana Sayfa</div>
+                        <div class="action-description">Dashboard'a geri dönün</div>
+                    </a>
+                    
+                    <a href="{% url 'dashboard:activity_log' %}" class="action-card">
+                        <div class="action-icon purple">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="action-title">Aktivite Logları</div>
+                        <div class="action-description">Sistem aktivitelerini izleyin</div>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1467,281 +842,119 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="profile-main-content">
-        <div class="left-column">
-            <!-- Profile Update Form -->
-            <div class="profile-form-card">
-                <h3 class="form-title">
-                    <i class="fas fa-user-edit"></i>
-                    Profil Bilgileri
-                </h3>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Ad</label>
-                            <input type="text" name="first_name" value="{{ user.first_name }}" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Soyad</label>
-                            <input type="text" name="last_name" value="{{ user.last_name }}" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">E-posta</label>
-                            <input type="email" name="email" value="{{ user.email }}" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">TC Kimlik No</label>
-                            <input type="text" name="tc_kimlik" value="{{ user.tc_kimlik }}" class="form-input" required>
-                        </div>
-                    </div>
-                    <div style="margin-top: 12px;">
-                        <button type="submit" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
-                            <i class="fas fa-save"></i>
-                            Güncelle
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Hızlı İstatistikler -->
-            <div class="stats-overview-card">
-                <h3 class="stats-title">
-                    <i class="fas fa-chart-pie"></i>
-                    Hızlı İstatistikler
-                </h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-icon blue">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">{{ user.date_joined|date:"d.m.Y" }}</div>
-                            <div class="stat-label">Üyelik Tarihi</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon green">
-                            <i class="fas fa-sign-in-alt"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">{{ user.last_login|date:"d.m.Y H:i"|default:"-" }}</div>
-                            <div class="stat-label">Son Giriş</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon purple">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">{{ user.get_role_display }}</div>
-                            <div class="stat-label">Kullanıcı Rolü</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon orange">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-value">{% if user.is_active %}Aktif{% else %}Pasif{% endif %}</div>
-                            <div class="stat-label">Hesap Durumu</div>
-                        </div>
-                    </div>
+    <!-- Profile Details Section -->
+    <div class="profile-details-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-user-edit"></i>
+                Profil Bilgileri
+            </h3>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Ad</label>
+                    <input type="text" name="first_name" value="{{ user.first_name }}" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Soyad</label>
+                    <input type="text" name="last_name" value="{{ user.last_name }}" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">E-posta</label>
+                    <input type="email" name="email" value="{{ user.email }}" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">TC Kimlik No</label>
+                    <input type="text" name="tc_kimlik" value="{{ user.tc_kimlik }}" class="form-input" required>
                 </div>
             </div>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions-card">
-                <h3 class="actions-title">
-                    <i class="fas fa-bolt"></i>
-                    Hızlı Erişim
-                </h3>
-                <div class="actions-grid">
-                    <a href="{% url 'users:change_password' %}" class="action-card">
-                        <div class="action-icon blue">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div class="action-content">
-                            <h4>Şifre Değiştir</h4>
-                            <p>Güvenlik için şifrenizi güncelleyin</p>
-                        </div>
-                    </a>
-                    <a href="{% url 'dashboard:home' %}" class="action-card">
-                        <div class="action-icon green">
-                            <i class="fas fa-home"></i>
-                        </div>
-                        <div class="action-content">
-                            <h4>Ana Sayfa</h4>
-                            <p>Dashboard'a geri dönün</p>
-                        </div>
-                    </a>
-                    <a href="{% url 'users:user_list' %}" class="action-card">
-                        <div class="action-icon purple">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="action-content">
-                            <h4>Kullanıcı Yönetimi</h4>
-                            <p>Sistem kullanıcılarını yönetin</p>
-                        </div>
-                    </a>
-                    <a href="{% url 'dashboard:activity_log' %}" class="action-card">
-                        <div class="action-icon orange">
-                            <i class="fas fa-list"></i>
-                        </div>
-                        <div class="action-content">
-                            <h4>Aktivite Logları</h4>
-                            <p>Sistem aktivitelerini izleyin</p>
-                        </div>
-                    </a>
-                </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Güncelle
+                </button>
             </div>
+        </form>
+    </div>
 
-            <!-- Sistem Bilgileri -->
-            <div class="system-info-card">
-                <h3 class="system-title">
-                    <i class="fas fa-server"></i>
-                    Sistem Bilgileri
-                </h3>
-                <div class="system-grid">
-                    <div class="system-item">
-                        <div class="system-icon info">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                        <div class="system-content">
-                            <div class="system-value">Django 5.2.5</div>
-                            <div class="system-label">Framework</div>
-                        </div>
-                    </div>
-                    <div class="system-item">
-                        <div class="system-icon success">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <div class="system-content">
-                            <div class="system-value">SQLite</div>
-                            <div class="system-label">Veritabanı</div>
-                        </div>
-                    </div>
-                    <div class="system-item">
-                        <div class="system-icon warning">
-                            <i class="fas fa-code"></i>
-                        </div>
-                        <div class="system-content">
-                            <div class="system-value">Python 3.13</div>
-                            <div class="system-label">Programlama</div>
-                        </div>
-                    </div>
-                    <div class="system-item">
-                        <div class="system-icon danger">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="system-content">
-                            <div class="system-value">Güvenli</div>
-                            <div class="system-label">Güvenlik</div>
-                        </div>
-                    </div>
+    <!-- Statistics Section -->
+    <div class="statistics-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-chart-pie"></i>
+                Hesap İstatistikleri
+            </h3>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar"></i>
                 </div>
+                <div class="stat-value">{{ user.date_joined|date:"d.m.Y" }}</div>
+                <div class="stat-label">Üyelik Tarihi</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-icon green">
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+                <div class="stat-value">{{ user.last_login|date:"d.m.Y H:i"|default:"-" }}</div>
+                <div class="stat-label">Son Giriş</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-icon purple">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="stat-value">{{ user.get_role_display }}</div>
+                <div class="stat-label">Kullanıcı Rolü</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-icon orange">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">{% if user.is_active %}Aktif{% else %}Pasif{% endif %}</div>
+                <div class="stat-label">Hesap Durumu</div>
             </div>
         </div>
+    </div>
 
-        <div class="right-sidebar">
-            <!-- Recent Activities -->
-            <div class="activities-card">
-                <h3 class="activities-title">
-                    <i class="fas fa-clock"></i>
-                    Son Aktiviteler
-                </h3>
-                <div class="activities-list">
-                    {% for log in recent_activities %}
-                    <div class="activity-item">
-                        <div class="activity-icon {{ log.log_type }}">
-                            <i class="fas fa-{% if log.log_type == 'login' %}sign-in-alt{% elif log.log_type == 'logout' %}sign-out-alt{% elif log.log_type == 'update' %}edit{% else %}plus{% endif %}"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">{{ log.description|truncatechars:30 }}</div>
-                            <div class="activity-time">{{ log.created_at|date:"d.m.Y H:i" }}</div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="activity-item">
-                        <div class="activity-icon info">
-                            <i class="fas fa-info"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Henüz aktivite yok</div>
-                            <div class="activity-time">-</div>
-                        </div>
-                    </div>
-                    {% endfor %}
+    <!-- Recent Activities Section -->
+    <div class="activities-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-clock"></i>
+                Son Aktiviteler
+            </h3>
+        </div>
+        
+        <div class="activities-list">
+            {% for log in recent_activities %}
+            <div class="activity-item">
+                <div class="activity-icon {{ log.log_type }}">
+                    <i class="fas fa-{% if log.log_type == 'login' %}sign-in-alt{% elif log.log_type == 'logout' %}sign-out-alt{% elif log.log_type == 'update' %}edit{% else %}plus{% endif %}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">{{ log.description|truncatechars:50 }}</div>
+                    <div class="activity-time">{{ log.created_at|date:"d.m.Y H:i" }}</div>
                 </div>
             </div>
-
-            <!-- Account Status -->
-            <div class="status-card">
-                <h3 class="status-title">
-                    <i class="fas fa-shield-alt"></i>
-                    Hesap Durumu
-                </h3>
-                <div class="account-status">
-                    <div class="status-item">
-                        <div class="status-dot {% if user.is_active %}active{% else %}warning{% endif %}"></div>
-                        <div class="status-text">
-                            {% if user.is_active %}Aktif{% else %}Pasif{% endif %}
-                        </div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-dot info"></div>
-                        <div class="status-text">{{ user.get_role_display }}</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-dot {% if user.is_locked %}warning{% else %}active{% endif %}"></div>
-                        <div class="status-text">
-                            {% if user.is_locked %}Kilitli{% else %}Açık{% endif %}
-                        </div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-dot info"></div>
-                        <div class="status-text">Son giriş: {{ user.last_login|date:"d.m.Y"|default:"-" }}</div>
-                    </div>
+            {% empty %}
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-info"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Henüz aktivite bulunmuyor</div>
+                    <div class="activity-time">-</div>
                 </div>
             </div>
-
-            <!-- Son Giriş Detayları -->
-            <div class="login-details-card">
-                <h3 class="login-title">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Son Giriş Detayları
-                </h3>
-                <div class="login-details">
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <i class="fas fa-calendar"></i>
-                        </div>
-                        <div class="detail-content">
-                            <div class="detail-label">Giriş Tarihi</div>
-                            <div class="detail-value">{{ user.last_login|date:"d.m.Y H:i:s"|default:"Bilinmiyor" }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="detail-content">
-                            <div class="detail-label">Giriş Süresi</div>
-                            <div class="detail-value">{% if user.last_login %}{{ user.last_login|timesince }}{% else %}-{% endif %}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <i class="fas fa-calendar-plus"></i>
-                        </div>
-                        <div class="detail-content">
-                            <div class="detail-label">Üyelik Süresi</div>
-                            <div class="detail-value">{{ user.date_joined|timesince }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

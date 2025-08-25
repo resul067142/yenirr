@@ -43,6 +43,15 @@ class Device(models.Model):
         help_text='Cihaza özel e-posta adresi'
     )
     
+    # Cihaz E-mail No (opsiyonel, 15 haneli)
+    email_number = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True,
+        verbose_name='Cihaz E-mail No',
+        help_text='15 haneli cihaz e-mail numarası'
+    )
+    
     # Cihaz Cinsi
     device_type = models.CharField(
         max_length=20,

@@ -313,7 +313,7 @@
             <i class="fas fa-phone"></i>
             İletişim Bilgileri
         </h3>
-        <div class="form-grid cols-2">
+        <div class="form-grid cols-3">
             <div class="form-group">
                 <label for="{{ form.gsm_number.id_for_label }}" class="form-label">
                     {{ form.gsm_number.label }}
@@ -334,7 +334,7 @@
 
             <div class="form-group">
                 <label for="{{ form.device_email.id_for_label }}" class="form-label">
-                    {{ form.device_email.label }}
+                    Dahili Telefon
                 </label>
                 {{ form.device_email }}
                 {% if form.device_email.errors %}
@@ -344,6 +344,27 @@
                             {{ error }}
                         {% endfor %}
                     </div>
+                {% endif %}
+                {% if form.device_email.help_text %}
+                    <p class="help-text">{{ form.device_email.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email_number.id_for_label }}" class="form-label">
+                    {{ form.email_number.label }}
+                </label>
+                {{ form.email_number }}
+                {% if form.email_number.errors %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {% for error in form.email_number.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if form.email_number.help_text %}
+                    <p class="help-text">{{ form.email_number.help_text }}</p>
                 {% endif %}
             </div>
         </div>
@@ -442,4 +463,110 @@
         </div>
     </form>
 </div>
+
+<script>
+// Otomatik Cihaz E-mail No oluşturma
+document.addEventListener('DOMContentLoaded', function() {
+    const emailNumberField = document.getElementById('{{ form.email_number.id_for_label }}');
+    const dahiliPhoneField = document.getElementById('{{ form.device_email.id_for_label }}');
+    
+    // E-mail No için buton
+    const generateButton = document.createElement('button');
+    generateButton.type = 'button';
+    generateButton.className = 'btn btn-secondary';
+    generateButton.style.marginTop = '8px';
+    generateButton.innerHTML = '<i class="fas fa-magic"></i> Otomatik Oluştur';
+    
+    // Dahili telefon için buton
+    const generateDahiliButton = document.createElement('button');
+    generateDahiliButton.type = 'button';
+    generateDahiliButton.className = 'btn btn-secondary';
+    generateDahiliButton.style.marginTop = '8px';
+    generateDahiliButton.innerHTML = '<i class="fas fa-phone"></i> Dahili Oluştur';
+    
+    // Eğer alan boşsa butonu göster
+    if (emailNumberField && emailNumberField.value === '') {
+        emailNumberField.parentNode.appendChild(generateButton);
+    }
+    
+    if (dahiliPhoneField && dahiliPhoneField.value === '') {
+        dahiliPhoneField.parentNode.appendChild(generateDahiliButton);
+    }
+    
+    generateButton.addEventListener('click', function() {
+        // 15 haneli rastgele numara oluştur
+        let number = '';
+        for (let i = 0; i < 15; i++) {
+            number += Math.floor(Math.random() * 10);
+        }
+        emailNumberField.value = number;
+        generateButton.disabled = true;
+        generateButton.innerHTML = '<i class="fas fa-check"></i> Oluşturuldu';
+        generateButton.style.background = '#10b981';
+    });
+    
+    generateDahiliButton.addEventListener('click', function() {
+        // XXXX XXXX formatında dahili telefon oluştur
+        const part1 = Math.floor(Math.random() * 9000) + 1000; // 1000-9999
+        const part2 = Math.floor(Math.random() * 9000) + 1000; // 1000-9999
+        dahiliPhoneField.value = `${part1} ${part2}`;
+        generateDahiliButton.disabled = true;
+        generateDahiliButton.innerHTML = '<i class="fas fa-check"></i> Oluşturuldu';
+        generateDahiliButton.style.background = '#10b981';
+    });
+    
+    // Alan değiştiğinde butonu güncelle
+    emailNumberField.addEventListener('input', function() {
+        if (this.value === '') {
+            generateButton.disabled = false;
+            generateButton.innerHTML = '<i class="fas fa-magic"></i> Otomatik Oluştur';
+            generateButton.style.background = '';
+        }
+    });
+    
+    dahiliPhoneField.addEventListener('input', function() {
+        if (this.value === '') {
+            generateDahiliButton.disabled = false;
+            generateDahiliButton.innerHTML = '<i class="fas fa-phone"></i> Dahili Oluştur';
+            generateDahiliButton.style.background = '';
+        }
+    });
+});
+
+// Form validasyonu
+document.querySelector('form').addEventListener('submit', function(e) {
+    const emailNumberField = document.getElementById('{{ form.email_number.id_for_label }}');
+    const dahiliPhoneField = document.getElementById('{{ form.device_email.id_for_label }}');
+    const gsmField = document.getElementById('{{ form.gsm_number.id_for_label }}');
+    
+    // GSM numarası formatla
+    if (gsmField.value) {
+        let gsm = gsmField.value.replace(/\D/g, '');
+        if (gsm.startsWith('0')) {
+            gsm = '+90' + gsm.substring(1);
+        } else if (!gsm.startsWith('90')) {
+            gsm = '+90' + gsm;
+        } else {
+            gsm = '+' + gsm;
+        }
+        gsmField.value = gsm;
+    }
+    
+    // Dahili telefon kontrolü
+    if (dahiliPhoneField.value && !/^\d{4}\s\d{4}$/.test(dahiliPhoneField.value)) {
+        e.preventDefault();
+        alert('Dahili telefon formatı: XXXX XXXX (örn: 3534 2255)');
+        dahiliPhoneField.focus();
+        return false;
+    }
+    
+    // Cihaz E-mail No kontrolü
+    if (emailNumberField.value && !/^\d{15}$/.test(emailNumberField.value)) {
+        e.preventDefault();
+        alert('Cihaz E-mail No 15 haneli sayı olmalıdır.');
+        emailNumberField.focus();
+        return false;
+    }
+});
+</script>
 {% endblock %}

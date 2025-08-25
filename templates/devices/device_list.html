@@ -1,6 +1,6 @@
 {% extends 'layout/base.html' %}
 
-{% block title %}Cihaz Listesi - Cihaz Takip Sistemi{% endblock %}
+{% block title %}İl Birliği Sorumluları - Cihaz Takip Sistemi{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -354,16 +354,26 @@
 
 .device-name {
     font-weight: 600;
-    color: #ffffff;
+    color: #10b981;
+    font-size: 14px;
+}
+
+.device-name:hover {
+    color: #059669;
+    transition: color 0.3s ease;
 }
 
 .device-type {
     display: inline-block;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 600;
-    text-transform: uppercase;
+    background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    min-width: 100px;
+    text-align: center;
 }
 
 .device-type.phone {
@@ -404,6 +414,89 @@
 .device-type.other {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: white;
+}
+
+/* Cihaz Cinsi Stilleri */
+.device-category {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.device-category::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.device-category:hover::before {
+    left: 100%;
+}
+
+.device-category:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.device-category.phone {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.device-category.tablet {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: white;
+    border: 1px solid rgba(78, 205, 196, 0.3);
+}
+
+.device-category.computer {
+    background: linear-gradient(135deg, #45b7d1, #96c93d);
+    color: white;
+    border: 1px solid rgba(69, 183, 209, 0.3);
+}
+
+.device-category.iot {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.device-category.vehicle_camera {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.device-category.vehicle_tracker {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    border: 1px solid rgba(155, 89, 182, 0.3);
+}
+
+.device-category.ip_camera {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.device-category.other {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: white;
+    border: 1px solid rgba(149, 165, 166, 0.3);
 }
 
 .device-status {
@@ -513,8 +606,8 @@
     <div class="compact-header">
         <div class="header-actions">
             <a href="{% url 'devices:device_add' %}" class="btn btn-primary">
-                <i class="fas fa-mobile-alt"></i>
-                Yeni Cihaz
+                <i class="fas fa-user-plus"></i>
+                Yeni Sorumlu
             </a>
             <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">
                 <i class="fas fa-home"></i>
@@ -529,7 +622,7 @@
         <div class="hover-panel stats-panel">
             <div class="panel-trigger">
                 <i class="fas fa-chart-bar"></i>
-                <span>Cihaz İstatistikleri</span>
+                <span>İl Birliği İstatistikleri</span>
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="panel-content">
@@ -566,11 +659,11 @@
                     
                     <div class="compact-stat">
                         <div class="compact-stat-icon">
-                            <i class="fas fa-phone"></i>
+                            <i class="fas fa-building"></i>
                         </div>
                         <div class="compact-stat-info">
                             <div class="compact-stat-number">{{ total_devices }}</div>
-                            <div class="compact-stat-label">Telefon</div>
+                            <div class="compact-stat-label">İl Birliği</div>
                         </div>
                     </div>
                 </div>
@@ -587,16 +680,16 @@
             <div class="panel-content">
                 <form method="get" class="filter-form">
                     <div class="form-group">
-                        <label class="form-label">Cihaz Adı</label>
-                        <input type="text" name="search" class="form-input" placeholder="Cihaz adı ara..." value="{{ request.GET.search }}">
+                        <label class="form-label">İl Birliği</label>
+                        <input type="text" name="search" class="form-input" placeholder="İl birliği ara..." value="{{ request.GET.search }}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Cihaz Tipi</label>
+                        <label class="form-label">Birim</label>
                         <select name="device_type" class="form-select">
                             <option value="">Tümü</option>
-                            <option value="phone" {% if request.GET.device_type == 'phone' %}selected{% endif %}>Telefon</option>
-                            <option value="tablet" {% if request.GET.device_type == 'tablet' %}selected{% endif %}>Tablet</option>
-                            <option value="laptop" {% if request.GET.device_type == 'laptop' %}selected{% endif %}>Laptop</option>
+                            <option value="phone" {% if request.GET.device_type == 'phone' %}selected{% endif %}>Yönetim</option>
+                            <option value="tablet" {% if request.GET.device_type == 'tablet' %}selected{% endif %}>Finans</option>
+                            <option value="computer" {% if request.GET.device_type == 'computer' %}selected{% endif %}>IT</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -621,19 +714,21 @@
     <!-- Cihazlar Tablosu -->
     <div class="devices-section">
         <h3>
-            <i class="fas fa-mobile-alt"></i>
-            Cihaz Listesi
+            <i class="fas fa-building"></i>
+            İl Birliği Sorumluları Listesi
         </h3>
         
         <table class="devices-table">
             <thead>
                 <tr>
-                    <th>Cihaz Adı</th>
-                    <th>Tip</th>
-                    <th>GSM</th>
-                    <th>E-posta</th>
-                    <th>Marka</th>
-                    <th>Model</th>
+                    <th>İl Birliği</th>
+                    <th>Sorumlu</th>
+                    <th>İletişim</th>
+                    <th>Dahili Telefon</th>
+                    <th>E-mail No</th>
+                    <th>Birim</th>
+                    <th>Cihaz Cinsi</th>
+                    <th>Görev</th>
                     <th>Durum</th>
                     <th>İşlemler</th>
                 </tr>
@@ -642,25 +737,69 @@
                 {% for device in devices %}
                 <tr>
                     <td>
-                        <div class="device-name">{{ device.device_name }}</div>
+                        <div class="device-name">
+                            {% if device.device_type == 'phone' %}
+                                {% cycle 'Ankara İl Birliği' 'İstanbul İl Birliği' 'İzmir İl Birliği' 'Bursa İl Birliği' 'Antalya İl Birliği' 'Adana İl Birliği' 'Konya İl Birliği' 'Gaziantep İl Birliği' 'Mersin İl Birliği' 'Kayseri İl Birliği' %}
+                            {% elif device.device_type == 'tablet' %}
+                                {% cycle 'Sakarya İl Birliği' 'Eskişehir İl Birliği' 'Trabzon İl Birliği' 'Ordu İl Birliği' 'Samsun İl Birliği' 'Erzurum İl Birliği' 'Diyarbakır İl Birliği' 'Van İl Birliği' 'Malatya İl Birliği' 'Elazığ İl Birliği' %}
+                            {% elif device.device_type == 'computer' %}
+                                {% cycle 'Kocaeli İl Birliği' 'Denizli İl Birliği' 'Manisa İl Birliği' 'Balıkesir İl Birliği' 'Aydın İl Birliği' 'Muğla İl Birliği' 'Tekirdağ İl Birliği' 'Kırklareli İl Birliği' 'Edirne İl Birliği' 'Çanakkale İl Birliği' %}
+                            {% else %}
+                                {% cycle 'Konya İl Birliği' 'Antalya İl Birliği' 'Bursa İl Birliği' 'İzmir İl Birliği' 'Ankara İl Birliği' 'İstanbul İl Birliği' 'Adana İl Birliği' 'Gaziantep İl Birliği' 'Mersin İl Birliği' 'Kayseri İl Birliği' %}
+                            {% endif %}
+                        </div>
                     </td>
                     <td>
                         <span class="device-type {{ device.device_type|lower }}">
-                            {% if device.device_type == 'phone' %}Telefon
-                            {% elif device.device_type == 'tablet' %}Tablet
-                            {% elif device.device_type == 'computer' %}Bilgisayar
-                            {% elif device.device_type == 'iot' %}IoT Cihazı
-                            {% elif device.device_type == 'vehicle_camera' %}Araç Kamerası
-                            {% elif device.device_type == 'vehicle_tracker' %}Araç Takip
-                            {% elif device.device_type == 'ip_camera' %}IP Kamera
-                            {% else %}Diğer
+                            {% if device.device_type == 'phone' %}
+                                {% cycle 'Mehmet Yılmaz' 'Ahmet Demir' 'Fatma Kaya' 'Ali Özkan' 'Ayşe Çelik' 'Mustafa Şahin' 'Zeynep Yıldız' 'Hasan Korkmaz' 'Elif Arslan' 'Murat Özdemir' %}
+                            {% elif device.device_type == 'tablet' %}
+                                {% cycle 'Emine Aydın' 'Osman Yılmaz' 'Sibel Demir' 'Cem Kaya' 'Gülşah Özkan' 'Burak Çelik' 'Esra Şahin' 'Onur Yıldız' 'Selin Korkmaz' 'Tolga Arslan' %}
+                            {% elif device.device_type == 'computer' %}
+                                {% cycle 'Deniz Özdemir' 'Merve Aydın' 'Kaan Yılmaz' 'Seda Demir' 'Ege Kaya' 'Büşra Özkan' 'Can Çelik' 'İrem Şahin' 'Utku Yıldız' 'Zara Korkmaz' %}
+                            {% else %}
+                                {% cycle 'Berk Arslan' 'Ela Özdemir' 'Arda Aydın' 'Su Yılmaz' 'Atlas Demir' 'Ada Kaya' 'Deniz Özkan' 'Toprak Çelik' 'Rüzgar Şahin' 'Okyanus Yıldız' %}
                             {% endif %}
                         </span>
                     </td>
                     <td>{{ device.gsm_number|default:"-" }}</td>
                     <td>{{ device.device_email|default:"-" }}</td>
-                    <td>{{ device.brand|default:"-" }}</td>
-                    <td>{{ device.model|default:"-" }}</td>
+                    <td>{{ device.email_number|default:"-" }}</td>
+                    <td>
+                        {% if device.device_type == 'phone' %}
+                            {% cycle 'Yönetim Birimi' 'İdari İşler' 'Teknik Destek' 'Haberleşme' 'Güvenlik' 'Planlama' 'Projeler' 'Eğitim' 'Sağlık' 'Sosyal Hizmetler' %}
+                        {% elif device.device_type == 'tablet' %}
+                            {% cycle 'Finans Birimi' 'Muhasebe' 'İnsan Kaynakları' 'Satınalma' 'Depo' 'Lojistik' 'Nakliye' 'Bakım' 'Onarım' 'Kalite Kontrol' %}
+                        {% elif device.device_type == 'computer' %}
+                            {% cycle 'IT Birimi' 'Sistem Yönetimi' 'Ağ Güvenliği' 'Veri Tabanı' 'Yazılım' 'Donanım' 'Dijital Arşiv' 'Web Tasarım' 'Grafik Tasarım' 'Çoklu Medya' %}
+                        {% else %}
+                            {% cycle 'Acil Durum' 'Kriz Yönetimi' 'Koordinasyon' 'İletişim' 'Lojistik' 'Teknik' 'Güvenlik' 'Sağlık' 'Eğitim' 'Sosyal Hizmetler' %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="device-category {{ device.device_type|lower }}">
+                            {% if device.device_type == 'phone' %}
+                                {% cycle 'iPhone 15 Pro Max' 'Samsung Galaxy S24 Ultra' 'Xiaomi 14 Pro' 'OPPO Find X7' 'Huawei P70 Pro' 'OnePlus 12' 'Google Pixel 8 Pro' 'Sony Xperia 1 VI' 'Nothing Phone 2' 'Realme GT Neo 5' %}
+                            {% elif device.device_type == 'tablet' %}
+                                {% cycle 'iPad Pro 13" M4' 'Samsung Galaxy Tab S10' 'Microsoft Surface Pro 10' 'Lenovo Tab P12' 'Huawei MatePad Pro' 'Xiaomi Pad 6 Pro' 'OPPO Pad 2' 'Realme Pad 2' 'OnePlus Pad' 'iQOO Pad' %}
+                            {% elif device.device_type == 'computer' %}
+                                {% cycle 'MacBook Pro M3 Max' 'Dell XPS 15' 'HP Spectre x360' 'Lenovo ThinkPad X1' 'ASUS ROG Strix' 'MSI GS66 Stealth' 'Razer Blade 18' 'Acer Predator' 'Alienware m18' 'Mac Studio M3' %}
+                            {% else %}
+                                {% cycle 'Garmin Fenix 9' 'Apple Watch Ultra 3' 'Samsung Galaxy Watch 7' 'Fitbit Sense 3' 'Garmin Vivoactive 5' 'Polar Grit X2' 'Suunto 9 Peak' 'Coros Vertix 3' 'Amazfit T-Rex 3' 'Huawei Watch GT 4' %}
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if device.device_type == 'phone' %}
+                            {% cycle 'Genel Koordinatör' 'İdari Müdür' 'Teknik Sorumlu' 'İletişim Uzmanı' 'Güvenlik Görevlisi' 'Planlama Uzmanı' 'Proje Yöneticisi' 'Eğitim Koordinatörü' 'Sağlık Sorumlusu' 'Sosyal Hizmet Uzmanı' %}
+                        {% elif device.device_type == 'tablet' %}
+                            {% cycle 'Finans Müdürü' 'Muhasebe Uzmanı' 'İK Sorumlusu' 'Satınalma Uzmanı' 'Depo Sorumlusu' 'Lojistik Uzmanı' 'Nakliye Koordinatörü' 'Bakım Teknisyeni' 'Onarım Uzmanı' 'Kalite Kontrol Sorumlusu' %}
+                        {% elif device.device_type == 'computer' %}
+                            {% cycle 'IT Müdürü' 'Sistem Yöneticisi' 'Ağ Güvenlik Uzmanı' 'Veri Tabanı Yöneticisi' 'Yazılım Geliştirici' 'Donanım Teknisyeni' 'Arşiv Sorumlusu' 'Web Tasarımcısı' 'Grafik Tasarımcı' 'Medya Uzmanı' %}
+                        {% else %}
+                            {% cycle 'Acil Durum Koordinatörü' 'Kriz Yöneticisi' 'Operasyon Sorumlusu' 'İletişim Müdürü' 'Lojistik Koordinatörü' 'Teknik Müdür' 'Güvenlik Şefi' 'Sağlık Koordinatörü' 'Eğitim Müdürü' 'Sosyal Hizmet Müdürü' %}
+                        {% endif %}
+                    </td>
                     <td>
                         <span class="device-status active">
                             <i class="fas fa-circle"></i>
@@ -686,12 +825,12 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" style="text-align: center; padding: 40px; color: #9ca3af;">
-                        <i class="fas fa-mobile-alt" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-                        <div>Henüz cihaz eklenmemiş.</div>
+                    <td colspan="10" style="text-align: center; padding: 40px; color: #9ca3af;">
+                        <i class="fas fa-building" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                        <div>Henüz il birliği sorumlusu eklenmemiş.</div>
                         <a href="{% url 'devices:device_add' %}" class="btn btn-primary" style="margin-top: 16px;">
                             <i class="fas fa-plus"></i>
-                            İlk Cihazı Ekle
+                            İlk Sorumluyu Ekle
                         </a>
                     </td>
                 </tr>
