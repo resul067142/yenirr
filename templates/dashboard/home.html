@@ -3,317 +3,327 @@
 {% block title %}Dashboard - Cihaz Takip Sistemi{% endblock %}
 
 {% block content %}
-<div class="space-y-1 md:space-y-2 lg:space-y-3">
-    <!-- Page Header -->
-    <div class="cyber-card">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-lg md:text-xl lg:text-2xl font-bold text-white mb-1">Dashboard</h1>
-                <p class="text-cyan-300 text-xs md:text-sm lg:text-base">Sistem genel durumu ve istatistikler</p>
+<div class="dashboard-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="gradient-text">Cihaz Takip Sistemi</span>
+                    <span class="hero-subtitle">Dashboard</span>
+                </h1>
+                <p class="hero-description">
+                    Sistem genel durumu, istatistikler ve hızlı erişim
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_devices|default:"0" }}</span>
+                        <span class="stat-label">Toplam Cihaz</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_users|default:"0" }}</span>
+                        <span class="stat-label">Toplam Kullanıcı</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ active_devices|default:"0" }}</span>
+                        <span class="stat-label">Aktif Cihaz</span>
+                    </div>
+                </div>
             </div>
-            <div class="text-right">
-                <p class="text-xs md:text-sm text-slate-300">{{ user.get_role_display }}</p>
-                <p class="text-xs text-cyan-400 font-mono">Son giriş: {{ user.last_login|date:"d.m.Y H:i" }}</p>
+            <div class="hero-actions">
+                <div class="quick-actions">
+                    <a href="{% url 'devices:device_add' %}" class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Yeni Cihaz</span>
+                    </a>
+                    <a href="{% url 'devices:device_list' %}" class="action-btn secondary">
+                        <i class="fas fa-list"></i>
+                        <span>Cihaz Listesi</span>
+                    </a>
+                    {% if is_admin %}
+                    <a href="{% url 'users:user_list' %}" class="action-btn secondary">
+                        <i class="fas fa-users"></i>
+                        <span>Kullanıcılar</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-cards">
+                <div class="floating-card card-1">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="floating-card card-2">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <div class="floating-card card-3">
+                    <i class="fas fa-tablet-alt"></i>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1 md:gap-2 lg:gap-3">
-        <!-- Toplam Cihaz -->
-        <div class="cyber-card">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-mobile-alt text-white text-lg md:text-xl"></i>
-                    </div>
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Statistics Cards Row -->
+        <div class="stats-row">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-mobile-alt"></i>
                 </div>
-                <div class="ml-3 md:ml-4">
-                    <p class="text-xs md:text-sm font-medium text-slate-300">Toplam Cihaz</p>
-                    <p class="text-2xl md:text-3xl font-bold text-white">{{ total_devices }}</p>
+                <div class="stat-content">
+                    <h3 class="stat-title">Toplam Cihaz</h3>
+                    <p class="stat-value">{{ total_devices|default:"0" }}</p>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+{{ active_devices|default:"0" }} aktif</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Aktif Cihaz -->
-        <div class="cyber-card">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-check-circle text-white text-lg md:text-xl"></i>
-                    </div>
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="ml-3 md:ml-4">
-                    <p class="text-xs md:text-sm font-medium text-slate-300">Aktif Cihaz</p>
-                    <p class="text-2xl md:text-3xl font-bold text-white">{{ active_devices }}</p>
+                <div class="stat-content">
+                    <h3 class="stat-title">Aktif Cihaz</h3>
+                    <p class="stat-value">{{ active_devices|default:"0" }}</p>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Çalışır durumda</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Pasif Cihaz -->
-        <div class="cyber-card">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-pause-circle text-white text-lg md:text-xl"></i>
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-pause-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-title">Pasif Cihaz</h3>
+                    <p class="stat-value">{{ inactive_devices|default:"0" }}</p>
+                    <div class="stat-change neutral">
+                        <i class="fas fa-minus"></i>
+                        <span>Beklemede</span>
                     </div>
                 </div>
-                <div class="ml-3 md:ml-4">
-                    <p class="text-xs md:text-sm font-medium text-slate-300">Pasif Cihaz</p>
-                    <p class="text-2xl md:text-3xl font-bold text-white">{{ inactive_devices }}</p>
+            </div>
+
+            {% if is_admin %}
+            <div class="stat-card info">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-title">Toplam Kullanıcı</h3>
+                    <p class="stat-value">{{ total_users|default:"0" }}</p>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+{{ locked_accounts|default:"0" }} kilitli</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card purple">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-title">Ortalama/Cihaz</h3>
+                    <p class="stat-value">{{ avg_devices_per_user|default:"0" }}</p>
+                    <div class="stat-change neutral">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Kullanıcı başına</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        Son 7 Günlük Cihaz Kayıtları
+                    </h3>
+                    <div class="chart-actions">
+                        <button class="chart-btn active" data-period="7">7 Gün</button>
+                        <button class="chart-btn" data-period="30">30 Gün</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="deviceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Cihaz Türü Dağılımı
+                    </h3>
+                    <div class="chart-legend">
+                        {% for type, count in device_type_stats.items %}
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: var(--chart-color-{{ forloop.counter }})"></span>
+                            <span class="legend-label">{{ type }}</span>
+                            <span class="legend-value">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="deviceTypeChart"></canvas>
                 </div>
             </div>
         </div>
 
         {% if is_admin %}
-        <!-- Kullanıcı Başına Ortalama -->
-        <div class="cyber-card">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-users text-white text-lg md:text-xl"></i>
-                    </div>
+        <!-- Admin Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-area"></i>
+                        Son 7 Günlük Kullanıcı Kayıtları
+                    </h3>
                 </div>
-                <div class="ml-3 md:ml-4">
-                    <p class="text-xs md:text-sm font-medium text-slate-300">Ortalama/Cihaz</p>
-                    <p class="text-2xl md:text-3xl font-bold text-white">{{ avg_devices_per_user }}</p>
+                <div class="chart-container">
+                    <canvas id="userChart"></canvas>
                 </div>
             </div>
-        </div>
-        {% else %}
-        <!-- Cihaz Ekleme Butonu -->
-        <div class="cyber-card">
-            <div class="flex items-center justify-center h-full">
-                <a href="{% url 'devices:device_add' %}" class="btn-cyber-primary">
-                    <i class="fas fa-plus mr-2"></i>
-                    Cihaz Ekle
-                </a>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-users-cog"></i>
+                        Kullanıcı Rolü Dağılımı
+                    </h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userRoleChart"></canvas>
+                </div>
             </div>
         </div>
         {% endif %}
-    </div>
 
-    {% if is_admin %}
-    <!-- Admin Statistics Row -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
-        <!-- Toplam Kullanıcı -->
-        <div class="cyber-card stat-card hover:scale-105 transition-transform duration-300">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center cyber-glow">
-                        <i class="fas fa-user-friends text-white text-xl"></i>
+        <!-- Quick Actions Section -->
+        <div class="quick-actions-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    Hızlı İşlemler
+                </h3>
+                <p class="section-subtitle">Sık kullanılan işlemlere hızlı erişim</p>
+            </div>
+            
+            <div class="actions-grid">
+                <a href="{% url 'devices:device_add' %}" class="action-card primary">
+                    <div class="action-icon">
+                        <i class="fas fa-plus"></i>
                     </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-400">Toplam Kullanıcı</p>
-                    <p class="text-3xl font-bold text-white">{{ total_users }}</p>
-                </div>
-            </div>
-        </div>
+                    <h4 class="action-title">Yeni Cihaz Ekle</h4>
+                    <p class="action-description">Sisteme yeni cihaz kaydı oluştur</p>
+                </a>
 
-        <!-- Kilitli Hesaplar -->
-        <div class="cyber-card stat-card hover:scale-105 transition-transform duration-300">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center cyber-glow">
-                        <i class="fas fa-lock text-white text-xl"></i>
+                <a href="{% url 'devices:device_list' %}" class="action-card secondary">
+                    <div class="action-icon">
+                        <i class="fas fa-list"></i>
                     </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-400">Kilitli Hesaplar</p>
-                    <p class="text-3xl font-bold text-white">{{ locked_accounts }}</p>
-                </div>
+                    <h4 class="action-title">Cihaz Listesi</h4>
+                    <p class="action-description">Tüm cihazları görüntüle ve yönet</p>
+                </a>
+
+                <a href="{% url 'dashboard:statistics' %}" class="action-card info">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h4 class="action-title">İstatistikler</h4>
+                    <p class="action-description">Detaylı sistem istatistiklerini incele</p>
+                </a>
+
+                <a href="{% url 'dashboard:activity_log' %}" class="action-card warning">
+                    <div class="action-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h4 class="action-title">Aktivite Logları</h4>
+                    <p class="action-description">Sistem aktivitelerini takip et</p>
+                </a>
+
+                {% if is_admin %}
+                <a href="{% url 'users:user_list' %}" class="action-card purple">
+                    <div class="action-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="action-title">Kullanıcı Yönetimi</h4>
+                    <p class="action-description">Kullanıcıları yönet ve yetkileri düzenle</p>
+                </a>
+
+                <a href="{% url 'dashboard:admin_panel' %}" class="action-card danger">
+                    <div class="action-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h4 class="action-title">Yönetim Paneli</h4>
+                    <p class="action-description">Sistem yönetimi ve konfigürasyon</p>
+                </a>
+                {% endif %}
             </div>
         </div>
 
-        <!-- Hızlı İşlemler -->
-        <div class="cyber-card stat-card hover:scale-105 transition-transform duration-300">
-            <div class="space-y-3">
-                <p class="text-sm font-medium text-gray-400">Hızlı İşlemler</p>
-                <div class="flex space-x-2">
-                    <a href="{% url 'devices:device_add' %}" class="btn-cyber-primary text-xs py-2 px-3">
-                        <i class="fas fa-plus mr-1"></i>
-                        Cihaz Ekle
-                    </a>
-                    <a href="{% url 'users:user_list' %}" class="btn-cyber-secondary text-xs py-2 px-3">
-                        <i class="fas fa-users mr-1"></i>
-                        Kullanıcılar
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Actions Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Kullanıcı Yönetimi -->
-        <div class="cyber-card">
-            <h2 class="text-xl font-bold text-cyan-400 mb-4">
-                <i class="fas fa-users-cog mr-2"></i>
-                Kullanıcı Yönetimi
-            </h2>
-            <div class="space-y-3">
-                <a href="{% url 'users:user_list' %}" class="btn-cyber-secondary w-full">
-                    <i class="fas fa-users mr-2"></i>
-                    Kullanıcı Listesi
-                </a>
-                <a href="{% url 'users:add_user' %}" class="btn-cyber-secondary w-full">
-                    <i class="fas fa-user-plus mr-2"></i>
-                    Yeni Kullanıcı
-                </a>
-            </div>
-        </div>
-
-        <!-- Yetki Yönetimi (Super Admin) -->
-        {% if user.role == 'superadmin' %}
-        <div class="cyber-card">
-            <h2 class="text-xl font-bold text-purple-400 mb-4">
-                <i class="fas fa-user-shield mr-2"></i>
-                Yetki Yönetimi
-            </h2>
-            <div class="space-y-3">
-                <a href="{% url 'users:user_permissions' %}" class="btn-cyber-primary w-full">
-                    <i class="fas fa-user-shield mr-2"></i>
-                    Kullanıcı Yetkileri
-                </a>
-                <a href="{% url 'dashboard:system_info' %}" class="btn-cyber-secondary w-full">
-                    <i class="fas fa-server mr-2"></i>
-                    Sistem Bilgileri
+        <!-- Recent Activities Section -->
+        <div class="activities-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Son Aktiviteler
+                </h3>
+                <a href="{% url 'dashboard:activity_log' %}" class="view-all-link">
+                    Tümünü Gör
+                    <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
-        </div>
-        {% else %}
-        <!-- Sistem Yönetimi (Admin) -->
-        <div class="cyber-card">
-            <h2 class="text-xl font-bold text-cyan-400 mb-4">
-                <i class="fas fa-server mr-2"></i>
-                Sistem Yönetimi
-            </h2>
-            <div class="space-y-3">
-                <a href="{% url 'dashboard:admin_panel' %}" class="btn-cyber-primary w-full">
-                    <i class="fas fa-cogs mr-2"></i>
-                    Yönetim Paneli
-                </a>
-                <a href="{% url 'dashboard:system_info' %}" class="btn-cyber-secondary w-full">
-                    <i class="fas fa-server mr-2"></i>
-                    Sistem Bilgileri
-                </a>
-                <a href="/admin/" target="_blank" class="btn-cyber-secondary w-full">
-                    <i class="fas fa-external-link-alt mr-2"></i>
-                    Django Admin
-                </a>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-3 lg:gap-4">
-        <!-- Son 7 Günlük Cihaz Kayıtları -->
-        <div class="cyber-card">
-            <h3 class="text-lg font-bold text-cyan-400 mb-2 flex items-center">
-                <i class="fas fa-chart-line mr-2"></i>
-                Son 7 Günlük Cihaz Kayıtları
-            </h3>
-            <div class="chart-container">
-                <canvas id="deviceChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Cihaz Türü Dağılımı -->
-        <div class="cyber-card">
-            <h3 class="text-lg font-bold text-cyan-400 mb-2 flex items-center">
-                <i class="fas fa-chart-pie mr-2"></i>
-                Cihaz Türü Dağılımı
-            </h3>
-            <div class="chart-container">
-                <canvas id="deviceTypeChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    {% if is_admin %}
-    <!-- Additional Admin Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-3 lg:gap-4">
-        <!-- Son 7 Günlük Kullanıcı Kayıtları -->
-        <div class="cyber-card">
-            <h3 class="text-lg font-bold text-cyan-400 mb-2 flex items-center">
-                <i class="fas fa-chart-area mr-2"></i>
-                Son 7 Günlük Kullanıcı Kayıtları
-            </h3>
-            <div class="chart-container">
-                <canvas id="userChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Kullanıcı Rolü Dağılımı -->
-        <div class="cyber-card">
-            <h3 class="text-lg font-bold text-cyan-400 mb-2 flex items-center">
-                <i class="fas fa-users-cog mr-2"></i>
-                Kullanıcı Rolü Dağılımı
-            </h3>
-            <div class="chart-container">
-                <canvas id="userRoleChart"></canvas>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Recent Activities -->
-    <div class="cyber-card">
-        <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-bold text-cyan-400 flex items-center">
-                <i class="fas fa-history mr-2"></i>
-                Son Aktiviteler
-            </h3>
-            <a href="{% url 'dashboard:activity_log' %}" class="text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
-                Tümünü Gör <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-        
-        <div class="space-y-2">
-            {% for activity in recent_activities %}
-            <div class="flex items-center p-2 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors">
-                <div class="flex-shrink-0">
-                    {% if activity.log_type == 'login' %}
-                        <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center cyber-glow">
-                            <i class="fas fa-sign-in-alt text-white text-xs"></i>
-                        </div>
-                    {% elif activity.log_type == 'device_add' %}
-                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center cyber-glow">
-                            <i class="fas fa-plus text-white text-xs"></i>
-                        </div>
-                    {% elif activity.log_type == 'device_update' %}
-                        <div class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center cyber-glow">
-                            <i class="fas fa-edit text-white text-xs"></i>
-                        </div>
-                    {% else %}
-                        <div class="w-8 h-8 bg-gradient-to-r from-gray-500 to-gray-600 rounded-full flex items-center justify-center cyber-glow">
-                            <i class="fas fa-info text-white text-xs"></i>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="ml-4 flex-1">
-                    <p class="text-sm font-bold text-white">
-                        {% if is_admin %}
-                            {{ activity.user.get_full_name }}
+            
+            <div class="activities-list">
+                {% for activity in recent_activities %}
+                <div class="activity-item">
+                    <div class="activity-icon {{ activity.log_type }}">
+                        {% if activity.log_type == 'login' %}
+                            <i class="fas fa-sign-in-alt"></i>
+                        {% elif activity.log_type == 'device_add' %}
+                            <i class="fas fa-plus"></i>
+                        {% elif activity.log_type == 'device_update' %}
+                            <i class="fas fa-edit"></i>
                         {% else %}
-                            Siz
+                            <i class="fas fa-info"></i>
                         {% endif %}
-                    </p>
-                    <p class="text-sm text-gray-400">{{ activity.description }}</p>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-header">
+                            <h4 class="activity-user">
+                                {% if is_admin %}
+                                    {{ activity.user.get_full_name|default:activity.user.username }}
+                                {% else %}
+                                    Siz
+                                {% endif %}
+                            </h4>
+                            <span class="activity-time">{{ activity.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                        <p class="activity-description">{{ activity.description }}</p>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-xs text-cyan-400 font-mono">{{ activity.created_at|date:"d.m.Y H:i" }}</p>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h4 class="empty-title">Henüz aktivite bulunmuyor</h4>
+                    <p class="empty-description">Sistem aktiviteleri burada görüntülenecek</p>
                 </div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <div class="text-center py-8 text-gray-400">
-                <i class="fas fa-info-circle text-4xl mb-3"></i>
-                <p>Henüz aktivite bulunmuyor.</p>
-            </div>
-            {% endfor %}
         </div>
     </div>
 </div>
@@ -321,6 +331,16 @@
 <!-- Chart.js Scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Chart.js konfigürasyonu
+    const chartColors = {
+        primary: '#3b82f6',
+        secondary: '#10b981',
+        accent: '#f59e0b',
+        danger: '#ef4444',
+        purple: '#8b5cf6',
+        cyan: '#06b6d4'
+    };
+
     // Son 7 Günlük Cihaz Kayıtları Grafiği
     const deviceCtx = document.getElementById('deviceChart').getContext('2d');
     const deviceChart = new Chart(deviceCtx, {
@@ -330,11 +350,16 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Yeni Cihazlar',
                 data: [{% for day in last_7_days_devices %}{{ day.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-                borderColor: '#00ffff',
-                backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                borderColor: chartColors.primary,
+                backgroundColor: `${chartColors.primary}20`,
                 tension: 0.4,
                 fill: true,
-                borderWidth: 3
+                borderWidth: 3,
+                pointBackgroundColor: chartColors.primary,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
             }]
         },
         options: {
@@ -350,20 +375,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1,
-                        color: '#6B7280'
+                        color: '#6B7280',
+                        font: {
+                            size: 12
+                        }
                     },
                     grid: {
-                        color: 'rgba(107, 114, 128, 0.2)'
+                        color: 'rgba(107, 114, 128, 0.1)',
+                        drawBorder: false
                     }
                 },
                 x: {
                     ticks: {
-                        color: '#6B7280'
+                        color: '#6B7280',
+                        font: {
+                            size: 12
+                        }
                     },
                     grid: {
-                        color: 'rgba(107, 114, 128, 0.2)'
+                        display: false
                     }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
@@ -377,14 +413,16 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 data: [{% for type, count in device_type_stats.items %}{{ count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
                 backgroundColor: [
-                    '#00ffff',
-                    '#10b981',
-                    '#f59e0b',
-                    '#ef4444',
-                    '#8b5cf6'
+                    chartColors.primary,
+                    chartColors.secondary,
+                    chartColors.accent,
+                    chartColors.danger,
+                    chartColors.purple
                 ],
-                borderWidth: 2,
-                borderColor: '#1f2937'
+                borderWidth: 3,
+                borderColor: '#1f2937',
+                hoverBorderWidth: 4,
+                hoverBorderColor: '#ffffff'
             }]
         },
         options: {
@@ -392,12 +430,13 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: '#6B7280',
-                        padding: 20
-                    }
+                    display: false
                 }
+            },
+            cutout: '60%',
+            animation: {
+                animateRotate: true,
+                animateScale: true
             }
         }
     });
@@ -412,11 +451,16 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Yeni Kullanıcılar',
                 data: [{% for day in last_7_days_users %}{{ day.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderColor: chartColors.secondary,
+                backgroundColor: `${chartColors.secondary}20`,
                 tension: 0.4,
                 fill: true,
-                borderWidth: 3
+                borderWidth: 3,
+                pointBackgroundColor: chartColors.secondary,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
             }]
         },
         options: {
@@ -432,18 +476,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1,
-                        color: '#6B7280'
+                        color: '#6B7280',
+                        font: {
+                            size: 12
+                        }
                     },
                     grid: {
-                        color: 'rgba(107, 114, 128, 0.2)'
+                        color: 'rgba(107, 114, 128, 0.1)',
+                        drawBorder: false
                     }
                 },
                 x: {
                     ticks: {
-                        color: '#6B7280'
+                        color: '#6B7280',
+                        font: {
+                            size: 12
+                        }
                     },
                     grid: {
-                        color: 'rgba(107, 114, 128, 0.2)'
+                        display: false
                     }
                 }
             }
@@ -459,12 +510,14 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 data: [{% for role, count in user_role_stats.items %}{{ count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
                 backgroundColor: [
-                    '#00ffff',
-                    '#10b981',
-                    '#f59e0b'
+                    chartColors.primary,
+                    chartColors.secondary,
+                    chartColors.accent
                 ],
-                borderWidth: 2,
-                borderColor: '#1f2937'
+                borderWidth: 3,
+                borderColor: '#1f2937',
+                hoverBorderWidth: 4,
+                hoverBorderColor: '#ffffff'
             }]
         },
         options: {
@@ -472,16 +525,703 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: '#6B7280',
-                        padding: 20
-                    }
+                    display: false
                 }
-            }
+            },
+            cutout: '60%'
         }
     });
     {% endif %}
+
+    // Chart period switcher
+    const periodButtons = document.querySelectorAll('.chart-btn');
+    periodButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            periodButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            // Burada period değişikliği için AJAX çağrısı yapılabilir
+        });
+    });
 });
 </script>
+
+<style>
+/* Dashboard Container */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981, #f59e0b);
+    background-size: 400% 100%;
+    animation: gradientShift 3s ease infinite;
+}
+
+.hero-content {
+    flex: 1;
+    z-index: 2;
+}
+
+.hero-title {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.gradient-text {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.hero-description {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    margin-bottom: 24px;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 24px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.stat-label {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.hero-actions {
+    z-index: 2;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.action-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+}
+
+.action-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.action-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.hero-visual {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+.floating-cards {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.floating-card {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #ffffff;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-card.card-1 {
+    top: 20px;
+    left: 20px;
+    animation-delay: 0s;
+}
+
+.floating-card.card-2 {
+    top: 120px;
+    right: 40px;
+    animation-delay: 2s;
+}
+
+.floating-card.card-3 {
+    bottom: 40px;
+    left: 60px;
+    animation-delay: 4s;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* Statistics Row */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid #4b5563;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-accent-color, #3b82f6);
+}
+
+.stat-card.primary { --card-accent-color: #3b82f6; }
+.stat-card.success { --card-accent-color: #10b981; }
+.stat-card.warning { --card-accent-color: #f59e0b; }
+.stat-card.info { --card-accent-color: #06b6d4; }
+.stat-card.purple { --card-accent-color: #8b5cf6; }
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: var(--card-accent-color);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--card-accent-color), var(--card-accent-color)dd);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.stat-content h3 {
+    color: #9ca3af;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.stat-change {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.stat-change.positive {
+    color: #10b981;
+}
+
+.stat-change.negative {
+    color: #ef4444;
+}
+
+.stat-change.neutral {
+    color: #6b7280;
+}
+
+/* Charts Section */
+.charts-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 24px;
+}
+
+.chart-card {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid #4b5563;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.chart-title {
+    color: #e2e8f0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chart-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.chart-btn {
+    padding: 8px 16px;
+    border: 1px solid #4b5563;
+    background: transparent;
+    color: #9ca3af;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.chart-btn.active,
+.chart-btn:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-label {
+    color: #9ca3af;
+}
+
+.legend-value {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.chart-container {
+    height: 300px;
+    position: relative;
+}
+
+/* Quick Actions Section */
+.quick-actions-section {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid #4b5563;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.section-title {
+    color: #e2e8f0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.section-subtitle {
+    color: #9ca3af;
+    font-size: 1rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.action-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.action-card.primary {
+    border-color: #3b82f6;
+}
+
+.action-card.secondary {
+    border-color: #6b7280;
+}
+
+.action-card.info {
+    border-color: #06b6d4;
+}
+
+.action-card.warning {
+    border-color: #f59e0b;
+}
+
+.action-card.purple {
+    border-color: #8b5cf6;
+}
+
+.action-card.danger {
+    border-color: #ef4444;
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 auto 16px;
+}
+
+.action-title {
+    color: #e2e8f0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.action-description {
+    color: #9ca3af;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Activities Section */
+.activities-section {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid #4b5563;
+}
+
+.activities-section .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.view-all-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+    color: #60a5fa;
+}
+
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
+}
+
+.activity-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.activity-icon.login {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.activity-icon.device_add {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.activity-icon.device_update {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.activity-icon.other {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.activity-user {
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.activity-time {
+    color: #9ca3af;
+    font-size: 0.9rem;
+    font-family: monospace;
+}
+
+.activity-description {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: #6b7280;
+    margin-bottom: 16px;
+}
+
+.empty-title {
+    color: #9ca3af;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.empty-description {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .hero-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 32px;
+    }
+    
+    .hero-visual {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 16px;
+    }
+    
+    .hero-section {
+        padding: 24px;
+    }
+    
+    .gradient-text {
+        font-size: 2rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-actions-section,
+    .activities-section {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 20px;
+    }
+    
+    .gradient-text {
+        font-size: 1.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+}
+</style>
 {% endblock %}
